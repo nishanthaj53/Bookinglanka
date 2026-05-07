@@ -1,0 +1,5 @@
+Phase	Task	Outcome
+0	Install deps	Server boots on /health
+1	Create local Postgres DB	DATABASE_URL works
+2	Prisma migrate (init)	Tables created
+3	Start API	GET /health returns { ok: true }

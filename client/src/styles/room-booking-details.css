@@ -1,0 +1,471 @@
+/* Gotur-style "Booking details" / "Some information" card (room manager + public room page) */
+.room-booking-details {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  padding: 1.35rem 1.5rem 1.5rem;
+}
+
+.room-booking-details__title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #1d231f;
+  margin: 0 0 1.1rem;
+  letter-spacing: 0.01em;
+}
+
+.room-booking-details__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.room-booking-details__row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid #eee;
+  font-size: 0.95rem;
+}
+
+.room-booking-details__row:last-child {
+  border-bottom: none;
+}
+
+.room-booking-details__check {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #63ab45;
+  position: relative;
+  box-shadow: 0 0 0 2px rgba(99, 171, 69, 0.2);
+}
+
+.room-booking-details__check::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 4px;
+  width: 6px;
+  height: 10px;
+  border: solid #fff;
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg);
+}
+
+.room-booking-details__label {
+  flex: 0 0 auto;
+  color: #333;
+  font-weight: 500;
+}
+
+.room-booking-details__label::after {
+  content: ":";
+  margin-right: 0.25rem;
+}
+
+.room-booking-details__row--amenity .room-booking-details__label::after {
+  content: "";
+  margin-right: 0;
+}
+
+.room-booking-details__value {
+  margin-left: auto;
+  text-align: right;
+  font-weight: 700;
+  color: #63ab45;
+  border: none;
+  background: transparent;
+  max-width: 55%;
+  min-width: 0;
+}
+
+.room-booking-details__value:focus {
+  outline: 1px solid rgba(99, 171, 69, 0.45);
+  border-radius: 4px;
+}
+
+.room-booking-details__value--readonly {
+  cursor: default;
+}
+
+/* Manager “view as guest” — match LTR / readable values (no public-site links in header) */
+.room-booking-details--manager-preview {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.room-booking-details--manager-preview .room-booking-details__value,
+.room-booking-details--manager-preview .room-booking-details__value--readonly {
+  margin-left: auto;
+  text-align: left;
+  direction: ltr;
+  max-width: none;
+}
+
+/* Manager edit card: numbers and text type LTR so long prices stay visible */
+.room-booking-details--editable {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.room-booking-details--editable .room-booking-details__row {
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.5rem 0.75rem;
+}
+
+.room-booking-details--editable .room-booking-details__label {
+  flex: 0 0 auto;
+  max-width: 42%;
+}
+
+.room-booking-details--editable .room-booking-details__value {
+  margin-left: auto;
+  text-align: left;
+  direction: ltr;
+  max-width: none;
+  flex: 1 1 140px;
+  min-width: 0;
+  width: auto;
+  padding: 0.2rem 0.35rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background: #fafcfa;
+  font-variant-numeric: tabular-nums;
+}
+
+.room-booking-details__icon-thumb {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(99, 171, 69, 0.35);
+}
+
+/* Manager room hero — ~1170×565 */
+.mgr-room-carousel-wrap {
+  border-radius: 12px;
+  overflow: visible;
+  border: 1px solid #e8e8e8;
+  background: #f4f4f4;
+  position: relative;
+}
+
+.room-photo-carousel__viewport {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.room-photo-carousel__viewport img {
+  width: 100%;
+  aspect-ratio: 1170 / 565;
+  object-fit: cover;
+  display: block;
+}
+
+.room-photo-carousel__nav {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 0.55rem 1.25rem 0.45rem;
+  background: #fff;
+  border-radius: 999px 999px 0 0;
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.08);
+  z-index: 3;
+}
+
+.room-photo-carousel__btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid #63ab45;
+  background: #fff;
+  color: #63ab45;
+  font-size: 1.1rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.room-photo-carousel__btn:hover {
+  background: rgba(99, 171, 69, 0.08);
+}
+
+.room-photo-carousel__btn:focus-visible {
+  outline: 2px solid rgba(99, 171, 69, 0.5);
+  outline-offset: 2px;
+}
+
+/* Guest-style manager preview: no dashboard chrome; thin toolbar only */
+.manager-room-guest-preview {
+  min-height: 100vh;
+  background: #fff;
+}
+
+.manager-room-guest-preview__toolbar {
+  background: #f8f9f8;
+  border-bottom: 1px solid #e5e5e5;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+/* Public + manager preview: amenity photos share one frame size */
+.room-amenity-tile__media {
+  width: 100%;
+  aspect-ratio: 370 / 243;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #eee;
+}
+
+.room-amenity-tile__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.mgr-amenity-grid__tile {
+  border: 1px dashed #ced4da;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+}
+
+.mgr-amenity-grid__thumb-slot {
+  width: 100%;
+  aspect-ratio: 370 / 243;
+  background: #eee;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.mgr-amenity-grid__thumb-slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.mgr-amenity-grid__tile-body {
+  padding: 0.65rem 0.75rem;
+}
+
+/* Room detail — centered amenities heading */
+.room-amenities-section__title,
+.room-amenities-section__subtitle {
+  text-align: center;
+  width: 100%;
+}
+
+.room-amenities-section__subtitle {
+  margin-bottom: 0.25rem;
+}
+
+/* Public book form — same card + row rhythm as Booking details */
+.room-booking-details--book-form {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.room-booking-details--book-form .room-booking-details__row {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+.room-booking-details--book-form .room-booking-details__label {
+  flex: 0 0 auto;
+  max-width: 46%;
+  margin: 0;
+}
+
+.room-booking-details--book-form .room-booking-details__value {
+  margin-left: auto;
+  text-align: left;
+  direction: ltr;
+  max-width: none;
+  flex: 1 1 140px;
+  min-width: 0;
+}
+
+.room-booking-details--book-form .room-booking-details__control {
+  margin-left: auto;
+  flex: 1 1 160px;
+  min-width: 0;
+  max-width: 100%;
+  text-align: left;
+  direction: ltr;
+  font-weight: 700;
+  color: #63ab45;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  padding: 0.4rem 0.55rem;
+  background: #fafcfa;
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.room-booking-details--book-form .room-booking-details__control:focus {
+  outline: 2px solid rgba(99, 171, 69, 0.35);
+  outline-offset: 1px;
+  border-color: rgba(99, 171, 69, 0.5);
+}
+
+.room-booking-details__control--select {
+  cursor: pointer;
+  appearance: auto;
+  padding-right: 1.75rem;
+  background-color: #fafcfa;
+}
+
+/* Hotel details sidebar — keep widget visible while scrolling room list */
+.room-booking-details--hotel-book {
+  position: sticky;
+  top: 1rem;
+}
+
+/* More rooms strip (public room page) */
+.room-other-rooms {
+  margin-top: 3rem;
+  padding: 2.5rem 0 2rem;
+  border-top: 1px solid #e8e8e8;
+  background: linear-gradient(180deg, #fafcfa 0%, #fff 40%);
+}
+
+.room-other-rooms__heading {
+  text-align: center;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #1d231f;
+  margin: 0 0 0.35rem;
+}
+
+.room-other-rooms__lede {
+  text-align: center;
+  font-size: 0.95rem;
+  margin: 0 auto 1.25rem;
+  max-width: 36rem;
+}
+
+.room-other-rooms__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.room-other-rooms__arrow {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #63ab45;
+  background: #fff;
+  color: #63ab45;
+  font-size: 1rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.room-other-rooms__arrow:hover {
+  background: rgba(99, 171, 69, 0.08);
+}
+
+.room-other-rooms__track {
+  display: flex;
+  gap: 1rem;
+}
+
+.room-other-rooms__track--few {
+  flex-wrap: wrap;
+  justify-content: center;
+  overflow: visible;
+}
+
+.room-other-rooms__track--scroll {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 0.5rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.room-other-rooms__card {
+  flex: 0 0 auto;
+  width: min(280px, 86vw);
+  scroll-snap-align: start;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+  color: inherit;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.room-other-rooms__track--few .room-other-rooms__card {
+  width: min(300px, 100%);
+}
+
+.room-other-rooms__card:hover {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.room-other-rooms__card-media {
+  aspect-ratio: 16 / 10;
+  background: #eee;
+  overflow: hidden;
+}
+
+.room-other-rooms__card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.room-other-rooms__card-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 120px;
+  background: linear-gradient(135deg, #e9ecef, #dee2e6);
+}
+
+.room-other-rooms__card-body {
+  padding: 0.85rem 1rem 1rem;
+}
+
+.room-other-rooms__card-name {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #1d231f;
+  margin-bottom: 0.25rem;
+}
+
+.room-other-rooms__card-meta {
+  font-size: 0.875rem;
+  color: #63ab45;
+  font-weight: 600;
+}

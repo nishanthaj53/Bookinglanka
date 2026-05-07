@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "public"."Booking" ADD COLUMN     "guests" INTEGER NOT NULL DEFAULT 1,
+ADD COLUMN     "rooms" INTEGER NOT NULL DEFAULT 1;

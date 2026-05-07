@@ -1,0 +1,128 @@
+import React, { useEffect, useMemo, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+
+import GetInTouchNavLink from "../../common/GetInTouchNavLink";
+import { navItems } from "../../../../data/navItems";
+import DemoPages from "../../common/DemoPages/DemoPages";
+
+import logo from "../../../../assets/images/logo-dark.png"
+
+const HeaderTwo = () => {
+  const location = useLocation();
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
+  const [destinations, setDestinations] = useState([]);
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadDestinations() {
+      try {
+        const res = await fetch(`${API_BASE}/destinations`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (mounted) setDestinations(Array.isArray(data) ? data : []);
+      } catch {
+        if (mounted) setDestinations([]);
+      }
+    }
+    loadDestinations();
+    return () => {
+      mounted = false;
+    };
+  }, [API_BASE]);
+
+  const dynamicNavItems = useMemo(() => {
+    if (!destinations.length) return navItems;
+    return navItems.map((item) => {
+      if (String(item.title || "").toLowerCase() !== "destination") return item;
+      return {
+        ...item,
+        subMenu: destinations.map((destination) => ({
+          id: destination.id,
+          title: destination.name,
+          link: `/destinations/${destination.slug}`,
+        })),
+      };
+    });
+  }, [destinations]);
+
+  const renderSubMenu = (subMenu) => (
+    <ul>
+      {subMenu.map((item, index) => (
+        <li key={index} className={item.subMenu ? "dropdown" : ""}>
+          <Link to={item.link || "#"}>{item.title}</Link>
+          {item.subMenu && renderSubMenu(item.subMenu)}
+        </li>
+      ))}
+    </ul>
+  );
+
+  return (
+    <header className="main-header main-header--two sticky-header sticky-header--normal">
+      <div className="container-fluid">
+        <div className="main-header__inner">
+          {/* LOGO */}
+          <div className="main-header__logo logo-retina">
+            <Link to="/">
+              <img
+                src={logo}
+                alt="Gotur"
+                width={160}
+                height={45}
+              />
+            </Link>
+          </div>
+
+          {/* NAV */}
+            <nav className="main-header__nav main-header__nav--two main-menu" style={{ display: "block" }}>
+
+              <ul className="main-menu__list">
+                <li className="dropdown megamenu">
+                  <Link to="/">Home</Link> 
+                  
+                
+                </li>
+
+                {dynamicNavItems.map((item) => (
+                  <li
+                    key={item.id}
+                    className={`${item.subMenu ? "dropdown" : ""} ${
+                      item.link && location.pathname.includes(item.link) ? "current" : ""
+                    }`}
+                  >
+                    <Link to={item.link || "#"}>{item.title}</Link>
+                    {item.subMenu && renderSubMenu(item.subMenu)}
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+
+          {/* RIGHT ACTIONS */}
+          <div className="main-header__right">
+            <GetInTouchNavLink className="gotur-btn main-header__btn" />
+
+            <div className="main-header__call">
+              <div className="main-header__call__icon">
+                <i className="icon-paper-plane"></i>
+              </div>
+              <div className="main-header__call__content">
+                <span className="main-header__call__subtitle">
+                  AI Trip Planner
+                </span>
+                <Link to="/ai-planner">Start Planning</Link>
+              </div>
+            </div>
+
+            <div className="mobile-nav__btn mobile-nav__toggler">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+};
+
+export default HeaderTwo;

@@ -1,0 +1,292 @@
+.preloader {
+  position: fixed;
+  background-color: var(--gotur-black, #1d231f);
+  background-position: center center;
+  background-repeat: no-repeat;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9991;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  align-items: center;
+  text-align: center;
+}
+.preloader__image {
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+  -webkit-animation-name: flipInY;
+  animation-name: flipInY;
+  -webkit-animation-duration: 2s;
+  animation-duration: 2s;
+  -webkit-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 60px auto;
+  width: 100%;
+  height: 100%;
+}
+.preloader-hidden {
+  display: none;
+}
+
+body.rtl .main-slider-one__destinations__hover {
+  position: absolute;
+  right: -180px;
+  top: -40px;
+  z-index: 1;
+}
+
+/*
+ * Popular Destinations: keep default Gotur teardrop radius + hover motion.
+ * Only a slight vertical stretch (same CSS animations from gotur.css).
+ */
+.popular-destination .destinations-card__thumb {
+  aspect-ratio: 1 / 1.38;
+}
+
+.popular-destination .destinations-card__thumb img {
+  height: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Dynamic destination page (/destinations/:slug): hero carousel not full-height */
+.destination-details .destination-carousel {
+  max-width: 920px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.destination-details .destination-carousel .destination-carousel__item {
+  max-height: min(380px, 48vh);
+  height: min(380px, 48vh);
+}
+
+.destination-details .destination-carousel .destination-carousel__item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+@media (max-width: 575px) {
+  .destination-details .destination-carousel .destination-carousel__item {
+    max-height: min(260px, 42vh);
+    height: min(260px, 42vh);
+  }
+}
+
+/* Blog “Travel Insights” cards: ~338×240 crop */
+.blog-two .blog-card-two--one .blog-card-two__image img {
+  aspect-ratio: 338 / 240;
+  object-fit: cover;
+  width: 100%;
+  display: block;
+}
+
+/* About Booking Lanka: explicit stack — large photo back, portrait photo front */
+.about-one__thumb__item--back {
+  position: relative;
+  z-index: 0;
+}
+
+.about-one__thumb__item--back img {
+  min-height: 280px;
+}
+
+.about-one__thumb__item-small--front {
+  z-index: 2;
+}
+
+.about-one__thumb__item-popup {
+  z-index: 3;
+}
+
+/* Landing hero (MainSliderThree): collage slot 797 × 713 */
+.main-slider-three__thumb img {
+  width: 797px;
+  max-width: 100%;
+  aspect-ratio: 797 / 713;
+  height: auto;
+  object-fit: cover;
+  display: block;
+  border-radius: 8px;
+}
+
+/* -----------------------------------------------------------------
+   Topbar (home-boxed style): circle icons for phone/mail/location
+   ----------------------------------------------------------------- */
+.top-one__info__item i,
+.top-one__right .top-one__info__item i {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  font-size: 14px;
+  margin-right: 10px;
+}
+
+.top-one__right .top-one__info__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+}
+
+.top-one__social a {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+.top-one__social a:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Footer: ensure inline SVG icons match theme color */
+.footer-widget__list__icon svg {
+  display: block;
+}
+
+/* Landing: popular destinations & hotel list pagination */
+.destinations-two__bottom__nav button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.landing-hotel-pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px 16px;
+  margin-top: 28px;
+}
+
+.landing-hotel-pager__arrow {
+  border: none;
+  outline: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: var(--gotur-base, #63ab45);
+  border: 1px solid var(--gotur-base, #63ab45);
+  background: transparent;
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.landing-hotel-pager__arrow svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+.landing-hotel-pager__arrow:hover:not(:disabled) {
+  background-color: var(--gotur-base, #63ab45);
+  color: var(--gotur-white, #fff);
+  border-color: transparent;
+}
+
+.landing-hotel-pager__arrow:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.landing-hotel-pager__nums {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.landing-hotel-pager__num {
+  min-width: 40px;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--gotur-border-color, #e5e5e5);
+  background: var(--gotur-white, #fff);
+  color: var(--gotur-black, #1d231f);
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.landing-hotel-pager__num:hover,
+.landing-hotel-pager__num.is-active {
+  background-color: var(--gotur-base, #63ab45);
+  color: var(--gotur-white, #fff);
+  border-color: var(--gotur-base, #63ab45);
+}
+
+/* body.boxed-wrapper .main-slider-one__destinations__hover {
+  position: absolute;
+  left: -150px;
+  top: -18px;
+  z-index: 1;
+} */
+
+/* About page CTA: use fixed 406x494 front image frame */
+.cta-two__thumb__item img {
+  width: 406px;
+  height: 494px;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Password field + SVG visibility toggle (Font Awesome not loaded on app shell) */
+.login-page__input-box--password input[type="text"],
+.login-page__input-box--password input[type="password"] {
+  padding-right: 48px;
+}
+
+.login-page__password-visibility-btn {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  margin: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--gotur-text, #595959);
+  cursor: pointer;
+  line-height: 0;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.login-page__password-visibility-btn:hover {
+  color: var(--gotur-base, #63ab45);
+  background-color: rgba(99, 171, 69, 0.08);
+}
+
+.login-page__password-visibility-btn:focus-visible {
+  outline: 2px solid var(--gotur-base, #63ab45);
+  outline-offset: 2px;
+}

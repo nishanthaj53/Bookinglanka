@@ -1,0 +1,106 @@
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+
+import GetInTouchNavLink from "../../common/GetInTouchNavLink";
+import { navItems } from "../../../../data/navItems";
+import mainLogo from "../../../../assets/images/logo-dark.png";
+import useStore from "../../../../store/useStore";
+
+export default function HeaderInner() {
+  const { pathname } = useLocation();
+  const { changeSearchPopupStatus, changeMobileDrawerTwoStatus } = useStore();
+
+  const renderSubMenu = (subMenu) => (
+    <ul>
+      {subMenu.map((item, index) => (
+        <li key={index} className={item.subMenu ? "dropdown" : ""}>
+          <Link to={item.link || "#"}>{item.title}</Link>
+          {item.subMenu && renderSubMenu(item.subMenu)}
+        </li>
+      ))}
+    </ul>
+  );
+
+  return (
+    <header className="main-header main-header--two sticky-header sticky-header--normal">
+      <div className="container-fluid">
+        <div className="main-header__inner">
+
+          {/* Logo */}
+          <div className="main-header__logo logo-retina">
+            <Link to="/">
+              <img
+                src={mainLogo}
+                alt="Booking Lanka"
+                width="160"
+                height="45"
+              />
+            </Link>
+          </div>
+
+          {/* Navigation */}
+          <nav className="main-header__nav main-menu">
+            <ul className="main-menu__list">
+              {navItems.map((item) => (
+                <li
+                  key={item.id}
+                  className={`${item.subMenu ? "dropdown" : ""} ${
+                    item.link && pathname.includes(item.link) ? "current" : ""
+                  }`}
+                >
+                  <Link to={item.link || "#"}>{item.title}</Link>
+                  {item.subMenu && renderSubMenu(item.subMenu)}
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* Right Section */}
+          <div className="main-header__right">
+
+            <div className="main-header__info">
+              <a
+                href="#"
+                className="search-toggler main-header__info__item"
+                onClick={(e) => {
+                  e.preventDefault();
+                  changeSearchPopupStatus();
+                }}
+              >
+                <i className="icon-search-interface-symbol"></i>
+                <span className="sr-only">Search</span>
+              </a>
+
+              <Link to="/cart" className="main-header__info__item">
+                <i className="icon-shopping-carts"></i>
+                <span className="sr-only">Cart</span>
+              </Link>
+            </div>
+
+            <GetInTouchNavLink className="gotur-btn main-header__btn" />
+
+            <div className="main-header__call">
+              <div className="main-header__call__icon">
+                <i className="icon-telephone"></i>
+              </div>
+              <div className="main-header__call__content">
+                <span className="main-header__call__subtitle">Call Us Now</span>
+                <a href="tel:+94112020400">+94 11 2020 400</a>
+              </div>
+            </div>
+
+            <div
+              className="mobile-nav__btn mobile-nav__toggler"
+              onClick={changeMobileDrawerTwoStatus}
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}

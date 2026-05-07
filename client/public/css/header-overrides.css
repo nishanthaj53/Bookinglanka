@@ -1,0 +1,86 @@
+/**
+ * Booking Lanka — header fixes after Gotur theme.
+ * Theme hides "Get in touch" below ~1570px CSS width (browser zoom reduces effective width).
+ * Keep CTA visible on all breakpoints and zoom levels.
+ */
+.main-header--two .main-header__btn,
+.main-header--one .main-header__btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* Optional: keep phone strip visible on Header Two at medium widths (theme hid it <1370px) */
+.main-header--two .main-header__call {
+  display: flex !important;
+  align-items: center;
+}
+
+/**
+ * Header Two (landing, destinations, dashboard shell, etc.) —
+ * center primary nav between logo and right actions; even spacing between links.
+ */
+@media (min-width: 1200px) {
+  .main-header--two .main-header__inner {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    column-gap: clamp(0.5rem, 1.5vw, 1.5rem);
+  }
+
+  .main-header--two .main-header__logo {
+    justify-self: start;
+  }
+
+  .main-header--two .main-header__nav {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    justify-self: center;
+    width: 100%;
+    max-width: 56rem;
+  }
+
+  .main-header--two .main-header__nav .main-menu__list {
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+    column-gap: clamp(1.25rem, 2.2vw, 2.5rem);
+    row-gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .main-header--two .main-menu .main-menu__list > li + li {
+    margin-left: 0 !important;
+  }
+
+  .main-header--two .main-header__right {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.75rem;
+  }
+}
+
+/* Authenticated header: allow bar to wrap only when desktop menu is hidden */
+@media (max-width: 1199px) {
+  .main-header--user-dashboard.main-header--two .main-header__inner {
+    flex-wrap: wrap;
+    row-gap: 0.75rem;
+  }
+
+  .main-header--user-dashboard.main-header--two .main-header__right {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.75rem;
+  }
+}
+
+.user-dashboard-gotur-main {
+  min-height: 40vh;
+  /* Breathing room between landing-style header and dashboard content */
+  padding-top: clamp(1.5rem, 4vw, 2.75rem);
+}

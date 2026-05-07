@@ -1,0 +1,39 @@
+{
+  "name": "booking-api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
+    "prisma:seed": "node prisma/seed.js",
+    "destinations:demo-images": "node scripts/applyDestinationDemoImages.js",
+    "hotels:delete-seed": "node scripts/deleteTestHotels.js",
+    "demo:restore-seed-manager-cleanup": "node scripts/demoRestoreSeedManagerCleanup.js",
+    "hotels:delete-scratch-names": "node scripts/deleteScratchHotelNames.js",
+    "demo:assign-manager-seed-hotels": "node scripts/assignTestingManagerSeedHotels.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.15.0",
+    "aws-sdk": "^1.18.0",
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "multer-s3": "^3.0.1",
+    "nodemailer": "^7.0.9",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0",
+    "prisma": "^6.19.2"
+  }
+}

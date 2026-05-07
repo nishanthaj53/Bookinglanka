@@ -1,0 +1,101 @@
+/* Booking Lanka — auth feedback dialog (aligned with .login-page / Gotur tokens) */
+/* Sit above Gotur sticky header / mobile nav (often z-index 9999+) */
+.modal.booking-lanka-auth-modal {
+  z-index: 10000050;
+}
+
+.modal-backdrop.booking-lanka-auth-modal__backdrop {
+  z-index: 10000040;
+}
+
+.booking-lanka-auth-modal .modal-dialog {
+  max-width: 420px;
+}
+
+.booking-lanka-auth-modal__content {
+  border: none;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 18px 50px rgba(29, 35, 31, 0.18);
+}
+
+.booking-lanka-auth-modal__body {
+  padding: 2rem 1.75rem 1.75rem;
+  text-align: center;
+  border-top: 4px solid var(--gotur-primary, #f7921e);
+  background: var(--gotur-white, #fff);
+}
+
+.booking-lanka-auth-modal__icon-ring {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.25rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--gotur-border-color, #e5e5e5);
+  background: var(--gotur-gray, #f5f5f5);
+}
+
+.booking-lanka-auth-modal__icon-ring--success {
+  border-color: rgba(99, 171, 69, 0.35);
+  background: rgba(99, 171, 69, 0.1);
+}
+
+.booking-lanka-auth-modal__icon-ring--success .booking-lanka-auth-modal__glyph {
+  color: var(--gotur-base, #63ab45);
+}
+
+.booking-lanka-auth-modal__icon-ring--warning {
+  border-color: rgba(247, 146, 30, 0.45);
+  background: rgba(247, 146, 30, 0.12);
+}
+
+.booking-lanka-auth-modal__icon-ring--warning .booking-lanka-auth-modal__glyph {
+  color: var(--gotur-primary, #f7921e);
+}
+
+.booking-lanka-auth-modal__icon-ring--error {
+  border-color: rgba(220, 53, 69, 0.35);
+  background: rgba(220, 53, 69, 0.08);
+}
+
+.booking-lanka-auth-modal__icon-ring--error .booking-lanka-auth-modal__glyph {
+  color: #c82333;
+}
+
+.booking-lanka-auth-modal__glyph {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  display: block;
+}
+
+.booking-lanka-auth-modal__title {
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 0 0 0.65rem;
+  color: var(--gotur-black, #1d231f);
+  text-transform: capitalize;
+}
+
+.booking-lanka-auth-modal__message {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--gotur-text, #595959);
+  margin: 0 0 0.5rem;
+}
+
+.booking-lanka-auth-modal__detail {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--gotur-text, #595959);
+  opacity: 0.92;
+  margin: 0 0 1.35rem;
+}
+
+.booking-lanka-auth-modal__body .gotur-btn {
+  margin-top: 0.25rem;
+}

@@ -1,0 +1,375 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// ---------- Core Users ----------
+model User {
+  id          String         @id @default(uuid())
+  email       String         @unique
+  password    String
+  roles       String[]       @default([])
+  hotelIds    String[]       @default([])
+  createdAt   DateTime       @default(now())
+  avatarUrl   String?
+  displayName String?
+  phone       String?
+  audit       AuditEvent[]   @relation("AuditUser")
+  bookings    Booking[]
+  hotelsOwned Hotel[]        @relation("HotelOwner")
+  payouts     Payout[]
+  payoutAcc   PayoutAccount?
+}
+
+/// ---------- Hotels & Rooms ----------
+model Hotel {
+  id              String             @id @default(uuid())
+  name            String
+  address         String?
+  /// Long-form description / overview text
+  description     String?
+  /// Short heading for the overview section (e.g. "Hotel Overview")
+  overviewTitle   String?            @default("Hotel Overview")
+  /// Rich overview text displayed on hotel detail UI
+  overview        String?
+  /// e.g. "Beachfront Hotel", "City Hotel"
+  propertyType    String?
+  /// Free-form display times (e.g. "2:00 PM")
+  checkInTime     String?
+  checkOutTime    String?
+  /// Optional base price per night in lowest currency unit (e.g. LKR cents)
+  basePrice       Int?
+  /// Bullet highlights shown in hotel detail hero
+  highlights      String[]           @default([])
+  /// General hotel amenities list
+  amenities       String[]           @default([])
+  /// Room-specific amenities list
+  roomAmenities   String[]           @default([])
+  /// Google Maps embed URL for this hotel location
+  mapEmbedUrl     String?
+  createdAt       DateTime           @default(now())
+  latitude        Float?
+  longitude       Float?
+  ownerUserId     String?
+  status          HotelStatus        @default(DRAFT)
+  bookings        Booking[]
+  commissionRules CommissionRule[]
+  owner           User?              @relation("HotelOwner", fields: [ownerUserId], references: [id])
+  images          HotelImage[]
+  amenityImages   HotelAmenityImage[]
+  nearbyLinks     HotelNearbyPlace[]
+  rooms           RoomType[]
+
+  @@index([latitude, longitude])
+}
+
+model RoomType {
+  id        String   @id @default(uuid())
+  hotelId   String
+  hotel     Hotel    @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  name      String
+  /// Number of rooms available under this same room type name
+  totalUnits Int     @default(1)
+  /// Optional description for rich room cards
+  description String?
+  capacity  Int
+  pricePerNight Int @default(100)
+  /// Optional display price per guest (e.g. for tours-style copy); not used in booking math unless you wire it
+  pricePerPerson Int?
+  createdAt DateTime @default(now())
+  /// e.g. "Ocean view", "City skyline" — shown on room detail / manager preview
+  viewpoint     String?
+  /// Section heading for long-form room copy (public room page)
+  overviewTitle String?            @default("Room overview")
+  overview      String?
+  /// Short bullet highlights (icons use default star in UI)
+  highlights    String[]           @default([])
+  bookings      Booking[]
+  images        RoomImage[]
+  amenityImages RoomAmenityImage[]
+  bookingBlocks RoomBookingBlock[]
+}
+
+/// Manager-defined manual pause/blackout window for a room type.
+/// During blocked dates, new user bookings are disabled.
+model RoomBookingBlock {
+  id         String   @id @default(uuid())
+  roomTypeId String
+  roomType   RoomType @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
+  startDate  DateTime
+  endDate    DateTime
+  reason     String?
+  createdAt  DateTime @default(now())
+
+  @@index([roomTypeId, startDate, endDate])
+}
+
+/// ---------- Images (stored in S3; DB keeps metadata) ----------
+model HotelImage {
+  id        String   @id @default(uuid())
+  hotelId   String
+  url       String
+  provider  String   @default("s3")
+  key       String?
+  altText   String?
+  isCover   Boolean  @default(false)
+  sortOrder Int      @default(0)
+  width     Int?
+  height    Int?
+  sizeBytes Int?
+  mimeType  String?
+  createdAt DateTime @default(now())
+  hotel     Hotel    @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+
+  @@index([hotelId, isCover, sortOrder])
+}
+
+model HotelAmenityImage {
+  id        String   @id @default(uuid())
+  hotelId   String
+  url       String
+  provider  String   @default("s3")
+  key       String?
+  altText   String?
+  sortOrder Int      @default(0)
+  width     Int?
+  height    Int?
+  sizeBytes Int?
+  mimeType  String?
+  createdAt DateTime @default(now())
+  hotel     Hotel    @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+
+  @@index([hotelId, sortOrder])
+}
+
+model RoomImage {
+  id         String   @id @default(uuid())
+  roomTypeId String
+  url        String
+  provider   String   @default("s3")
+  key        String?
+  altText    String?
+  isCover    Boolean  @default(false)   // ✅ NEW LINE
+  sortOrder  Int      @default(0)
+  width      Int?
+  height     Int?
+  sizeBytes  Int?
+  mimeType   String?
+  createdAt  DateTime @default(now())
+  roomType   RoomType @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
+
+  @@index([roomTypeId, sortOrder])
+}
+
+/// Room-level amenity tiles: label + image (used as icon on room detail sidebar)
+model RoomAmenityImage {
+  id         String   @id @default(uuid())
+  roomTypeId String
+  roomType   RoomType @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
+  /// Display name, e.g. "Wi‑Fi", "Sea view"
+  label      String
+  url        String
+  provider   String   @default("s3")
+  key        String?
+  altText    String?
+  sortOrder  Int      @default(0)
+  width      Int?
+  height     Int?
+  sizeBytes  Int?
+  mimeType   String?
+  createdAt  DateTime @default(now())
+
+  @@index([roomTypeId, sortOrder])
+}
+
+/// ---------- Bookings & Payments (split to manager + commission) ----------
+model Booking {
+  id          String        @id @default(uuid())
+  userId      String
+  hotelId     String
+  roomTypeId  String
+  checkIn     DateTime
+  checkOut    DateTime
+  totalAmount Int
+  currency    String        @default("USD")
+  guests      Int           @default(1)
+  rooms       Int           @default(1)
+  createdAt   DateTime      @default(now())
+  status      BookingStatus @default(DRAFT)
+  cancelReason String?
+  reminderAt   DateTime?
+  reminderSeenAt DateTime?
+  reminderMessage String?
+  hotel       Hotel         @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  roomType    RoomType      @relation(fields: [roomTypeId], references: [id], onDelete: SetNull)
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payment     Payment?
+}
+
+
+model Payment {
+  id                   String        @id @default(uuid())
+  bookingId            String        @unique
+  provider             String
+  gatewayRef           String?
+  amount               Int
+  fee                  Int           @default(0)
+  net                  Int           @default(0)
+  capturedAt           DateTime?
+  createdAt            DateTime      @default(now())
+  applicationFee       Int           @default(0)
+  destinationAccountId String?
+  status               PaymentStatus @default(INITIATED)
+  booking              Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+}
+
+/// ---------- Manager Payout Setup & Summaries ----------
+model PayoutAccount {
+  id          String              @id @default(uuid())
+  userId      String              @unique
+  provider    String              @default("stripe")
+  accountId   String?
+  status      PayoutAccountStatus @default(PENDING)
+  detailsJson Json?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @default(now())
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Payout {
+  id         String       @id @default(uuid())
+  userId     String
+  periodFrom DateTime
+  periodTo   DateTime
+  gross      Int
+  fees       Int
+  commission Int
+  net        Int
+  status     PayoutStatus @default(PENDING)
+  createdAt  DateTime     @default(now())
+  paidAt     DateTime?
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, periodFrom, periodTo])
+}
+
+/// ---------- Commission Rules (global or per-hotel override) ----------
+model CommissionRule {
+  id        String   @id @default(uuid())
+  hotelId   String?
+  rateBps   Int
+  fixedFee  Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  hotel     Hotel?   @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+
+  @@index([hotelId, active])
+}
+
+/// ---------- Places (POIs) & linkage to Hotels (cache) ----------
+model Place {
+  id         String             @id @default(uuid())
+  name       String
+  category   String
+  latitude   Float
+  longitude  Float
+  source     String?
+  sourceId   String?
+  rating     Float?
+  address    String?
+  createdAt  DateTime           @default(now())
+  hotelLinks HotelNearbyPlace[]
+
+  @@index([latitude, longitude])
+}
+
+model HotelNearbyPlace {
+  hotelId        String
+  placeId        String
+  distanceMeters Int
+  cachedAt       DateTime @default(now())
+  hotel          Hotel    @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  place          Place    @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@id([hotelId, placeId])
+}
+
+/// ---------- Destination content ----------
+model Destination {
+  id            String   @id @default(uuid())
+  name          String   @unique
+  slug          String   @unique
+  district      String?
+  town          String?
+  region        String?
+  bestFor       String?
+  overview      String?
+  whyVisit      String?
+  mapEmbedUrl   String?
+  coverImageUrl String?
+  /// Portrait-style image for landing + explorer cards (optional; falls back to cover)
+  cardImageUrl  String?
+  galleryImages String[] @default([])
+  faqs          Json?
+  isActive      Boolean  @default(true)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
+/// ---------- Audit ----------
+model AuditEvent {
+  id           String   @id @default(uuid())
+  actorUserId  String?
+  entityType   String
+  entityId     String
+  action       String
+  snapshotJson Json?
+  createdAt    DateTime @default(now())
+  actorUser    User?    @relation("AuditUser", fields: [actorUserId], references: [id])
+
+  @@index([entityType, entityId, createdAt])
+}
+
+/// ---------- Enums ----------
+enum HotelStatus {
+  DRAFT
+  ACTIVE
+}
+
+enum BookingStatus {
+  DRAFT
+  PENDING_PAYMENT
+  PAID
+  CHECKED_IN
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  INITIATED
+  AUTHORIZED
+  CAPTURED
+  REFUNDED
+  FAILED
+}
+
+enum PayoutAccountStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum PayoutStatus {
+  PENDING
+  PAID
+  FAILED
+}

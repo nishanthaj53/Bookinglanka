@@ -1,0 +1,266 @@
+%% Entity–relationship view generated from server/prisma/schema.prisma (PostgreSQL / Prisma)
+%% Regenerate PDF after schema changes: npx @mermaid-js/mermaid-cli -i docs/database-er.mmd -o docs/database-er.pdf
+
+erDiagram
+  User ||--o{ Booking : "books"
+  User ||--o{ Hotel : "owns"
+  User ||--o{ Payout : "receives"
+  User ||--o| PayoutAccount : "has"
+  User ||--o{ AuditEvent : "acts"
+
+  Hotel ||--o{ RoomType : "contains"
+  Hotel ||--o{ Booking : "receives"
+  Hotel ||--o{ HotelImage : "has"
+  Hotel ||--o{ HotelAmenityImage : "has"
+  Hotel ||--o{ CommissionRule : "overrides"
+  Hotel ||--o{ HotelNearbyPlace : "links"
+
+  RoomType ||--o{ Booking : "reserved_by"
+  RoomType ||--o{ RoomImage : "has"
+  RoomType ||--o{ RoomAmenityImage : "has"
+  RoomType ||--o{ RoomBookingBlock : "blocked"
+
+  Booking ||--o| Payment : "paid_by"
+
+  Place ||--o{ HotelNearbyPlace : "near"
+
+  User {
+    uuid id PK
+    string email UK
+    string password
+    string_array roles
+    string_array hotelIds
+    datetime createdAt
+    string avatarUrl
+    string displayName
+    string phone
+  }
+
+  Hotel {
+    uuid id PK
+    string name
+    string address
+    string description
+    string overviewTitle
+    string overview
+    string propertyType
+    string checkInTime
+    string checkOutTime
+    int basePrice
+    string_array highlights
+    string_array amenities
+    string_array roomAmenities
+    string mapEmbedUrl
+    datetime createdAt
+    float latitude
+    float longitude
+    uuid ownerUserId FK
+    HotelStatus status
+  }
+
+  RoomType {
+    uuid id PK
+    uuid hotelId FK
+    string name
+    int totalUnits
+    string description
+    int capacity
+    int pricePerNight
+    int pricePerPerson
+    datetime createdAt
+    string viewpoint
+    string overviewTitle
+    string overview
+    string_array highlights
+  }
+
+  RoomBookingBlock {
+    uuid id PK
+    uuid roomTypeId FK
+    datetime startDate
+    datetime endDate
+    string reason
+    datetime createdAt
+  }
+
+  HotelImage {
+    uuid id PK
+    uuid hotelId FK
+    string url
+    string provider
+    string key
+    string altText
+    boolean isCover
+    int sortOrder
+    int width
+    int height
+    int sizeBytes
+    string mimeType
+    datetime createdAt
+  }
+
+  HotelAmenityImage {
+    uuid id PK
+    uuid hotelId FK
+    string url
+    string provider
+    string key
+    string altText
+    int sortOrder
+    int width
+    int height
+    int sizeBytes
+    string mimeType
+    datetime createdAt
+  }
+
+  RoomImage {
+    uuid id PK
+    uuid roomTypeId FK
+    string url
+    string provider
+    string key
+    string altText
+    boolean isCover
+    int sortOrder
+    int width
+    int height
+    int sizeBytes
+    string mimeType
+    datetime createdAt
+  }
+
+  RoomAmenityImage {
+    uuid id PK
+    uuid roomTypeId FK
+    string label
+    string url
+    string provider
+    string key
+    string altText
+    int sortOrder
+    int width
+    int height
+    int sizeBytes
+    string mimeType
+    datetime createdAt
+  }
+
+  Booking {
+    uuid id PK
+    uuid userId FK
+    uuid hotelId FK
+    uuid roomTypeId FK
+    datetime checkIn
+    datetime checkOut
+    int totalAmount
+    string currency
+    int guests
+    int rooms
+    datetime createdAt
+    BookingStatus status
+    string cancelReason
+    datetime reminderAt
+    datetime reminderSeenAt
+    string reminderMessage
+  }
+
+  Payment {
+    uuid id PK
+    uuid bookingId FK_UK
+    string provider
+    string gatewayRef
+    int amount
+    int fee
+    int net
+    datetime capturedAt
+    datetime createdAt
+    int applicationFee
+    string destinationAccountId
+    PaymentStatus status
+  }
+
+  PayoutAccount {
+    uuid id PK
+    uuid userId FK_UK
+    string provider
+    string accountId
+    PayoutAccountStatus status
+    json detailsJson
+    datetime createdAt
+    datetime updatedAt
+  }
+
+  Payout {
+    uuid id PK
+    uuid userId FK
+    datetime periodFrom
+    datetime periodTo
+    int gross
+    int fees
+    int commission
+    int net
+    PayoutStatus status
+    datetime createdAt
+    datetime paidAt
+  }
+
+  CommissionRule {
+    uuid id PK
+    uuid hotelId FK_nullable
+    int rateBps
+    int fixedFee
+    boolean active
+    datetime createdAt
+  }
+
+  Place {
+    uuid id PK
+    string name
+    string category
+    float latitude
+    float longitude
+    string source
+    string sourceId
+    float rating
+    string address
+    datetime createdAt
+  }
+
+  HotelNearbyPlace {
+    uuid hotelId FK "PK"
+    uuid placeId FK "PK"
+    int distanceMeters
+    datetime cachedAt
+  }
+
+  Destination {
+    uuid id PK
+    string name UK
+    string slug UK
+    string district
+    string town
+    string region
+    string bestFor
+    string overview
+    string whyVisit
+    string mapEmbedUrl
+    string coverImageUrl
+    string cardImageUrl
+    string_array galleryImages
+    json faqs
+    boolean isActive
+    int sortOrder
+    datetime createdAt
+    datetime updatedAt
+  }
+
+  AuditEvent {
+    uuid id PK
+    uuid actorUserId FK_nullable
+    string entityType
+    string entityId
+    string action
+    json snapshotJson
+    datetime createdAt
+  }
