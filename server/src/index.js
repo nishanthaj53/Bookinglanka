@@ -57,7 +57,7 @@ app.use(
       if (!origin || ALLOWED_ORIGINS.includes(origin)) {
         callback(null, origin || ALLOWED_ORIGINS[0]);
       } else {
-        callback(new Error(`CORS blocked for origin: ${origin}`));
+        callback(null, false);
       }
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
