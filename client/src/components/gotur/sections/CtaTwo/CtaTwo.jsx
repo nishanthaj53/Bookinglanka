@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
-import ctaTwoData from "../../../../data/ctatwodata";
+import ctaTwoData from "../../../../data/ctaTwoData";
 import useCountdown from "../../../../hooks/useCountDown";
 import TextAnimation from "../../common/AnimatedText/TextAnimation";
 const CtaTwo = () => {
