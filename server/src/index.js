@@ -44,6 +44,14 @@ const ALLOWED_ORIGINS = (process.env.CORS_ORIGIN || "http://localhost:5173")
   .map((origin) => origin.trim())
   .filter(Boolean);
 
+function isAllowedOrigin(origin) {
+  if (!origin) return true;
+  if (ALLOWED_ORIGINS.includes(origin)) return true;
+  // Vercel gives each deployment its own URL (e.g. bookinglanka-abc123.vercel.app)
+  if (/^https:\/\/[\w-]+\.vercel\.app$/.test(origin)) return true;
+  return false;
+}
+
 /* ================= GLOBAL MIDDLEWARE (ONCE) ================= */
 app.use(
   helmet({
@@ -54,7 +62,7 @@ app.use(
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+      if (isAllowedOrigin(origin)) {
         callback(null, origin || ALLOWED_ORIGINS[0]);
       } else {
         callback(null, false);
