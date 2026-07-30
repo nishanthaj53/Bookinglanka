@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 
 import GetInTouchNavLink from "../../common/GetInTouchNavLink";
 import { navItems } from "../../../../data/navItems";
-import DemoPages from "../../common/DemoPages/DemoPages";
+import useStore from "../../../../store/useStore";
 
 import logo from "../../../../assets/images/logo-dark.png"
 
@@ -11,6 +11,9 @@ const HeaderTwo = () => {
   const location = useLocation();
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
   const [destinations, setDestinations] = useState([]);
+  const changeMobileDrawerTwoStatus = useStore(
+    (state) => state.changeMobileDrawerTwoStatus
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -73,7 +76,7 @@ const HeaderTwo = () => {
           </div>
 
           {/* NAV */}
-            <nav className="main-header__nav main-header__nav--two main-menu" style={{ display: "block" }}>
+            <nav className="main-header__nav main-header__nav--two main-menu">
 
               <ul className="main-menu__list">
                 <li className="dropdown megamenu">
@@ -113,11 +116,16 @@ const HeaderTwo = () => {
               </div>
             </div>
 
-            <div className="mobile-nav__btn mobile-nav__toggler">
+            <button
+              type="button"
+              className="mobile-nav__btn mobile-nav__toggler"
+              aria-label="Open menu"
+              onClick={changeMobileDrawerTwoStatus}
+            >
               <span></span>
               <span></span>
               <span></span>
-            </div>
+            </button>
           </div>
         </div>
       </div>

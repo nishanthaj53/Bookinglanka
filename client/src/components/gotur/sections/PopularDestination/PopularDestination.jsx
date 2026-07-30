@@ -91,7 +91,7 @@ const PopularDestinations = () => {
           {visibleDestinations.map((dest, idx) => (
             <div
               key={dest.id}
-              className="col-xl-3 col-lg-4 col-md-4 col-sm-6"
+              className="col-xl-3 col-lg-4 col-md-6 col-6"
             >
               <div
                 className="destinations-card wow fadeInUp"

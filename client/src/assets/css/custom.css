@@ -57,6 +57,96 @@ body.rtl .main-slider-one__destinations__hover {
   object-position: center;
 }
 
+@media (max-width: 767px) {
+  .popular-destination .destinations-card {
+    max-width: 280px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .popular-destination .destinations-card__thumb {
+    aspect-ratio: 1 / 1.15;
+    max-height: 300px;
+    border-radius: 90px 0 90px 90px;
+  }
+
+  .popular-destination .destinations-card__title {
+    font-size: 28px;
+    line-height: 1.1;
+  }
+
+  .popular-destination .destinations-card__group-card {
+    left: 50%;
+    transform: translate(-50%, 80px);
+    bottom: 40px;
+    gap: 8px;
+  }
+
+  .popular-destination .destinations-card:hover .destinations-card__group-card {
+    transform: translate(-50%, 0);
+  }
+
+  .popular-destination .destinations-card__group-card__text {
+    font-size: 13px;
+    padding: 4px 8px;
+  }
+}
+
+@media (max-width: 575px) {
+  .popular-destination .destinations-card {
+    max-width: 220px;
+  }
+
+  .popular-destination .destinations-card__thumb {
+    max-height: 250px;
+  }
+
+  .popular-destination .destinations-card__title {
+    font-size: 24px;
+  }
+
+  .main-slider-three__title {
+    font-size: 42px !important;
+    line-height: 1.15 !important;
+    margin-bottom: 16px;
+  }
+
+  .main-slider-three__sub-title {
+    font-size: 16px;
+  }
+
+  .main-slider-three__text {
+    font-size: 15px;
+    margin-bottom: 24px;
+  }
+
+  .main-slider-three__thumb {
+    margin-top: 24px;
+  }
+
+  .main-slider-three__thumb img {
+    width: 100% !important;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .main-header--two .main-header__logo img {
+    width: 120px;
+    height: auto;
+  }
+
+  .main-header--two .mobile-nav__btn {
+    margin-left: 16px;
+  }
+
+  .cta-two__thumb__item img {
+    width: 100%;
+    max-width: 280px;
+    height: auto;
+    aspect-ratio: 406 / 494;
+  }
+}
+
 /* Dynamic destination page (/destinations/:slug): hero carousel not full-height */
 .destination-details .destination-carousel {
   max-width: 920px;
@@ -289,4 +379,27 @@ body.rtl .main-slider-one__destinations__hover {
 .login-page__password-visibility-btn:focus-visible {
   outline: 2px solid var(--gotur-base, #63ab45);
   outline-offset: 2px;
+}
+
+/* Compact footer (contact + copyright only) */
+.main-footer__bottom--highlight .main-footer__bottom__inner.center {
+  justify-content: center;
+  text-align: center;
+}
+
+.main-footer__copyright {
+  margin: 0;
+  color: var(--gotur-white, #fff);
+}
+
+/* Mobile drawer: show expanded destination submenu */
+.mobile-nav__content .main-menu__list ul.open {
+  display: block !important;
+}
+
+.mobile-nav__close {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--gotur-white, #fff);
 }

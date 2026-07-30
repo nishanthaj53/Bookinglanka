@@ -1,11 +1,8 @@
 import React from "react";
-import { Container, Row, Col } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import MailchimpSubscribe from "react-mailchimp-subscribe";
 
 import { footerOneData } from "../../../../data/footerOneData";
-
-const url = "//xxxx.us13.list-manage.com/subscribe/post?u=zefzefzef&id=fnfgn";
 
 function FooterInfoIcon({ type }) {
   const t = String(type || "").toLowerCase();
@@ -43,7 +40,6 @@ function FooterInfoIcon({ type }) {
     );
   }
 
-  // time / clock
   return (
     <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
       <path
@@ -59,8 +55,6 @@ export default function FooterOne() {
 
   return (
     <footer className="main-footer">
-
-      {/* ================= TOP ================= */}
       <div className="main-footer__top">
         <Container>
           <div
@@ -70,12 +64,7 @@ export default function FooterOne() {
           >
             <div className="footer-widget__logo logo-retina">
               <Link to="/">
-                <img
-                  src={data.logo}
-                  alt="gotur logo"
-                  width="158"
-                  height="45"
-                />
+                <img src={data.logo} alt="Booking Lanka" width="158" height="45" />
               </Link>
             </div>
 
@@ -85,12 +74,8 @@ export default function FooterOne() {
                   <FooterInfoIcon type="email" />
                 </div>
                 <div className="footer-widget__list__content">
-                  <span className="footer-widget__list__subtitle">
-                    send email
-                  </span>
-                  <a href={`mailto:${data.contact.email}`}>
-                    {data.contact.email}
-                  </a>
+                  <span className="footer-widget__list__subtitle">send email</span>
+                  <a href={`mailto:${data.contact.email}`}>{data.contact.email}</a>
                 </div>
               </li>
 
@@ -99,9 +84,7 @@ export default function FooterOne() {
                   <FooterInfoIcon type="phone" />
                 </div>
                 <div className="footer-widget__list__content">
-                  <span className="footer-widget__list__subtitle">
-                    call agent
-                  </span>
+                  <span className="footer-widget__list__subtitle">call agent</span>
                   <a
                     href={`tel:${data.contact.phoneTel || data.contact.phone?.replace(/\s/g, "") || ""}`}
                   >
@@ -115,9 +98,7 @@ export default function FooterOne() {
                   <FooterInfoIcon type="location" />
                 </div>
                 <div className="footer-widget__list__content">
-                  <span className="footer-widget__list__subtitle">
-                    visit us
-                  </span>
+                  <span className="footer-widget__list__subtitle">visit us</span>
                   <a
                     href={data.contact.mapsSearchUrl || "#"}
                     target="_blank"
@@ -133,9 +114,7 @@ export default function FooterOne() {
                   <FooterInfoIcon type="time" />
                 </div>
                 <div className="footer-widget__list__content">
-                  <span className="footer-widget__list__subtitle">
-                    opening time
-                  </span>
+                  <span className="footer-widget__list__subtitle">opening time</span>
                   <p>{data.contact.hours}</p>
                 </div>
               </li>
@@ -144,144 +123,6 @@ export default function FooterOne() {
         </Container>
       </div>
 
-      {/* ================= MIDDLE ================= */}
-      <div className="main-footer__middle">
-        <Container>
-          <Row className="gutter-y-40">
-
-            <Col md={6} lg={4} xl={3}>
-              <div
-                className="footer-widget footer-widget--about wow fadeInUp"
-                data-wow-duration="1500ms"
-                data-wow-delay="0ms"
-              >
-                <h2 className="footer-widget__title">about Gotur</h2>
-                <p className="footer-widget__about-text">
-                  {data.about.text}
-                </p>
-
-                <div className="footer-widget__social">
-                  {data.about.socials.map((social, idx) => (
-                    <a
-                      key={idx}
-                      href={social.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <i className={social.icon}></i>
-                      <span className="sr-only">{social.label}</span>
-                    </a>
-                  ))}
-                </div>
-              </div>
-            </Col>
-
-            <Col md={6} lg={4} xl={3}>
-              <div
-                className="footer-widget footer-widget--links wow fadeInUp"
-                data-wow-duration="1500ms"
-                data-wow-delay="200ms"
-              >
-                <h2 className="footer-widget__title">Destinations</h2>
-                <ul className="list-unstyled footer-widget__links">
-                  {data.destinations.map((item, idx) => (
-                    <li key={idx}>
-                      <Link to={item.href}>{item.title}</Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </Col>
-
-            <Col md={6} lg={4} xl={3}>
-              <div
-                className="footer-widget footer-widget--post wow fadeInUp"
-                data-wow-duration="1500ms"
-                data-wow-delay="400ms"
-              >
-                <h2 className="footer-widget__title">useful links</h2>
-                <ul className="list-unstyled footer-widget__links">
-                  {data.usefulLinks.map((item, idx) => (
-                    <li key={idx}>
-                      <Link to={item.href}>{item.title}</Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </Col>
-
-            <Col md={6} lg={5} xl={3}>
-              <div
-                className="footer-widget footer-widget--contact wow fadeInUp"
-                data-wow-duration="1500ms"
-                data-wow-delay="600ms"
-              >
-                <h2 className="footer-widget__title">Newsletter</h2>
-                <p className="footer-widget__contact-text">
-                  {data.newsletter.text}
-                </p>
-
-                <MailchimpSubscribe
-                  url={url}
-                  render={({ subscribe, status, message }) => (
-                    <div className="mc-form">
-                      <form
-                        className="footer-widget__newsletter mc-form"
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          const email =
-                            e.currentTarget.EMAIL.value;
-                          if (email) subscribe({ EMAIL: email });
-                        }}
-                      >
-                        <div className="form-group__form">
-                          <input
-                            type="email"
-                            name="EMAIL"
-                            placeholder="Your email address"
-                          />
-                          <button type="submit" className="gotur-btn">
-                            <span className="icon-right-arrow"></span>
-                          </button>
-                        </div>
-
-                        <div className="form-group__check">
-                          <input type="checkbox" id="check" />
-                          <label htmlFor="check">
-                            I agree to the{" "}
-                            <Link to={data.newsletter.privacyLink}>
-                              Privacy Policy.
-                            </Link>
-                          </label>
-                        </div>
-                      </form>
-
-                      <div className="mc-form__response">
-                        {status === "sending" && <div>sending...</div>}
-                        {status === "error" && (
-                          <div dangerouslySetInnerHTML={{ __html: message }} />
-                        )}
-                        {status === "success" && <div>Subscribed!</div>}
-                      </div>
-                    </div>
-                  )}
-                />
-              </div>
-            </Col>
-
-          </Row>
-        </Container>
-
-        <div className="main-footer__element-one">
-          <img src={data.shape1} alt="footer shape" />
-        </div>
-        <div className="main-footer__element-two">
-          <img src={data.shape2} alt="footer shape" />
-        </div>
-      </div>
-
-      {/* ================= BOTTOM (FIXED) ================= */}
-      {/* ================= BOTTOM ================= */}
       <div className="main-footer__bottom main-footer__bottom--highlight">
         <Container>
           <div className="main-footer__bottom__inner center">
@@ -291,8 +132,6 @@ export default function FooterOne() {
           </div>
         </Container>
       </div>
-
-
     </footer>
   );
 }

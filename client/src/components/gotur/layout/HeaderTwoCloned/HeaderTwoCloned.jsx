@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 
 import GetInTouchNavLink from "../../common/GetInTouchNavLink";
 import { navItems } from "../../../../data/navItems";
-// import DemoPages from "@/components/common/DemoPages/DemoPages";
+import useStore from "../../../../store/useStore";
 import main_logo from "./../../../../assets/images/logo-dark.png";
 
 const HeaderTwoCloned = () => {
@@ -11,6 +11,9 @@ const HeaderTwoCloned = () => {
   const [isSticky, setIsSticky] = useState(false);
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
   const [destinations, setDestinations] = useState([]);
+  const changeMobileDrawerTwoStatus = useStore(
+    (state) => state.changeMobileDrawerTwoStatus
+  );
 
   // Sticky header on scroll
   useEffect(() => {
@@ -86,7 +89,7 @@ const HeaderTwoCloned = () => {
           </div>
 
           {/* NAV */}
-          <nav className="main-header__nav main-header__nav--two main-menu"style={{ display: "block" }}>
+          <nav className="main-header__nav main-header__nav--two main-menu">
             <ul className="main-menu__list">
               <li className="dropdown megamenu">
                 <Link to="/">Home</Link>
@@ -124,6 +127,17 @@ const HeaderTwoCloned = () => {
                 <Link to="/ai-planner">Start Planning</Link>
               </div>
             </div>
+
+            <button
+              type="button"
+              className="mobile-nav__btn mobile-nav__toggler"
+              aria-label="Open menu"
+              onClick={changeMobileDrawerTwoStatus}
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
           </div>
         </div>
       </div>
