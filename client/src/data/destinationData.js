@@ -5,8 +5,8 @@ import Dest4 from "../assets/images/resources/destinations-1-4.jpg";
 import Shape1 from "../assets/images/shapes/des-1-1.png";
 
 export const sectionTitle = {
-  tagline: "Popular Destination",
-  title: "Popular",
+  tagline: "Destinations",
+  title: "Explore",
   highlight: "Destinations",
   shape: Shape1,
 };

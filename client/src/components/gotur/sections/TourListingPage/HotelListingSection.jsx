@@ -6,6 +6,13 @@ import {
   PagerChevronLeft,
   PagerChevronRight,
 } from "../../common/LandingPagerArrows/LandingPagerArrows";
+import TextAnimation from "../../common/AnimatedText/TextAnimation";
+
+const hotelsSectionTitle = {
+  tagline: "Hotels",
+  title: "Featured",
+  highlight: "Hotels",
+};
 
 /**
  * Build image URL for card images.
@@ -98,6 +105,28 @@ export default function HotelListingSection({
   return (
     <section className="tour-listing-page section-space" id="properties">
       <Container>
+        <div className="sec-title text-center">
+          <h6 className="sec-title__tagline bw-split-in-right">
+            <TextAnimation
+              text={hotelsSectionTitle.tagline}
+              animationType="right"
+            />
+          </h6>
+
+          <h3 className="sec-title__title bw-split-in-left d-flex gap-2 justify-content-center">
+            <TextAnimation
+              text={hotelsSectionTitle.title}
+              animationType="left"
+            />
+            <span>
+              <TextAnimation
+                text={hotelsSectionTitle.highlight}
+                animationType="left"
+              />
+            </span>
+          </h3>
+        </div>
+
         {/* FILTER UI – native inputs so it works without option lists */}
         <div className="listing-from">
           <Form

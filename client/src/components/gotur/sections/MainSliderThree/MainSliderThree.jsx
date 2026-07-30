@@ -52,8 +52,8 @@ const MainSliderThree = () => {
     <>
       <section className="main-slider-three" id="home">
         <Container>
-          <Row className="justify-content-start">
-            <Col xxl={6} lg={12}>
+          <Row className="align-items-center justify-content-start">
+            <Col xl={6} lg={12}>
               <div className="main-slider-three__content">
                 <h5 className="main-slider-three__sub-title main-three bw-split-in-left">
                   <TextAnimation text={tagLine} animationType="left" />
@@ -96,7 +96,7 @@ const MainSliderThree = () => {
               </div>
             </Col>
 
-            <Col xxl={6}>
+            <Col xl={6} lg={12}>
               <div className="main-slider-three__thumb">
                 <img
                   src={thumbImage}

@@ -425,7 +425,32 @@ body.rtl .main-slider-one__destinations__hover {
   }
 }
 
-@media (max-width: 1199px) {
+/* Desktop / laptop: always show full nav links */
+@media (min-width: 992px) {
+  .main-header--two .main-header__nav {
+    display: block !important;
+  }
+
+  .main-header--two .main-menu .main-menu__list {
+    display: flex !important;
+    align-items: center;
+  }
+
+  .main-header--two .main-menu .main-menu__list > li > ul {
+    display: none;
+  }
+
+  .main-header--two .main-menu .main-menu__list > li:hover > ul {
+    display: block;
+  }
+
+  .main-header--two .main-header__brand .mobile-nav__btn {
+    display: none !important;
+  }
+}
+
+/* Mobile / small tablet: hamburger + Get in touch */
+@media (max-width: 991px) {
   .main-header--two .main-header__inner {
     display: flex;
     align-items: center;
@@ -435,7 +460,7 @@ body.rtl .main-slider-one__destinations__hover {
   }
 
   .main-header--two .main-header__nav {
-    display: none;
+    display: none !important;
   }
 
   .main-header--two .main-header__right {
@@ -452,8 +477,8 @@ body.rtl .main-slider-one__destinations__hover {
     display: none !important;
   }
 
-  .main-header--two .mobile-nav__btn {
-    display: flex;
+  .main-header--two .main-header__brand .mobile-nav__btn {
+    display: flex !important;
   }
 
   .main-header--two .main-header__logo {
@@ -463,6 +488,31 @@ body.rtl .main-slider-one__destinations__hover {
   .main-header--two .main-header__logo img {
     width: 120px;
     height: auto;
+  }
+
+  /* Hero image visible on mobile (theme hid it below 991px) */
+  .main-slider-three__content {
+    height: auto !important;
+    padding-top: 110px;
+    padding-bottom: 24px;
+  }
+
+  .main-slider-three__thumb {
+    display: block !important;
+    position: relative !important;
+    bottom: auto !important;
+    right: auto !important;
+    margin: 12px auto 28px;
+    max-width: 520px;
+    width: 100%;
+  }
+
+  .main-slider-three__thumb img {
+    width: 100% !important;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
   }
 }
 
@@ -479,4 +529,24 @@ body.rtl .main-slider-one__destinations__hover {
   .main-header--two .main-header__logo img {
     width: 100px;
   }
+
+  .main-slider-three__title {
+    font-size: 42px !important;
+    line-height: 1.15 !important;
+    margin-bottom: 16px;
+  }
+
+  .main-slider-three__sub-title {
+    font-size: 16px;
+  }
+
+  .main-slider-three__text {
+    font-size: 15px;
+    margin-bottom: 24px;
+  }
+}
+
+/* Hotels section heading spacing */
+.tour-listing-page .sec-title {
+  margin-bottom: 40px;
 }
