@@ -5,7 +5,7 @@ import { navItems } from "../../../../data/navItems";
 import logo from "../../../../assets/images/logo-light.png";
 
 export default function MobileNavDrawer() {
-  const { mobileDrawerTwoStatus, changeMobileDrawerTwoStatus } = useStore();
+  const { mobileDrawerTwoStatus, setMobileDrawerTwoStatus } = useStore();
   const [destinations, setDestinations] = useState([]);
   const [openItemId, setOpenItemId] = useState(null);
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
@@ -51,7 +51,7 @@ export default function MobileNavDrawer() {
     };
   }, [mobileDrawerTwoStatus]);
 
-  const close = () => changeMobileDrawerTwoStatus();
+  const close = () => setMobileDrawerTwoStatus(false);
 
   return (
     <div className={`mobile-nav__wrapper ${mobileDrawerTwoStatus ? "expanded" : ""}`}>
@@ -75,30 +75,35 @@ export default function MobileNavDrawer() {
               return (
                 <li key={item.id} className={hasSub ? "dropdown" : ""}>
                   {hasSub ? (
-                    <a
-                      href={item.link || "#"}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setOpenItemId(isOpen ? null : item.id);
-                      }}
-                    >
-                      {item.title}
-                    </a>
+                    <>
+                      <a
+                        href={item.link || "#"}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setOpenItemId(isOpen ? null : item.id);
+                        }}
+                      >
+                        {item.title}
+                      </a>
+                      <ul className={isOpen ? "open" : "close"}>
+                        <li>
+                          <Link to={item.link || "/destinations"} onClick={close}>
+                            All destinations
+                          </Link>
+                        </li>
+                        {item.subMenu.map((sub) => (
+                          <li key={sub.id}>
+                            <Link to={sub.link || "#"} onClick={close}>
+                              {sub.title}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </>
                   ) : (
                     <Link to={item.link || "#"} onClick={close}>
                       {item.title}
                     </Link>
-                  )}
-                  {hasSub && (
-                    <ul className={isOpen ? "open" : "close"}>
-                      {item.subMenu.map((sub) => (
-                        <li key={sub.id}>
-                          <Link to={sub.link || "#"} onClick={close}>
-                            {sub.title}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
                   )}
                 </li>
               );

@@ -15,7 +15,6 @@ const HeaderTwoCloned = () => {
     (state) => state.changeMobileDrawerTwoStatus
   );
 
-  // Sticky header on scroll
   useEffect(() => {
     const onScroll = () => {
       setIsSticky(window.scrollY > 500);
@@ -76,31 +75,43 @@ const HeaderTwoCloned = () => {
     >
       <div className="container-fluid">
         <div className="main-header__inner">
-          {/* LOGO */}
-          <div className="main-header__logo logo-retina">
-            <Link to="/">
-              <img
-                src={main_logo}
-                alt="Gotur"
-                width="160"
-                height="45"
-              />
-            </Link>
+          <div className="main-header__brand">
+            <div className="main-header__logo logo-retina">
+              <Link to="/">
+                <img
+                  src={main_logo}
+                  alt="Booking Lanka"
+                  width="160"
+                  height="45"
+                />
+              </Link>
+            </div>
+
+            <button
+              type="button"
+              className="mobile-nav__btn mobile-nav__toggler"
+              aria-label="Open menu"
+              onClick={changeMobileDrawerTwoStatus}
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
           </div>
 
-          {/* NAV */}
           <nav className="main-header__nav main-header__nav--two main-menu">
             <ul className="main-menu__list">
-              <li className="dropdown megamenu">
+              <li>
                 <Link to="/">Home</Link>
-                
               </li>
 
               {dynamicNavItems.map((item) => (
                 <li
                   key={item.id}
                   className={`${item.subMenu ? "dropdown" : ""} ${
-                    item.link && location.pathname.includes(item.link)
+                    item.link &&
+                    item.link !== "/#properties" &&
+                    location.pathname.includes(item.link)
                       ? "current"
                       : ""
                   }`}
@@ -112,7 +123,6 @@ const HeaderTwoCloned = () => {
             </ul>
           </nav>
 
-          {/* RIGHT SIDE */}
           <div className="main-header__right">
             <GetInTouchNavLink className="gotur-btn main-header__btn" />
 
@@ -127,17 +137,6 @@ const HeaderTwoCloned = () => {
                 <Link to="/ai-planner">Start Planning</Link>
               </div>
             </div>
-
-            <button
-              type="button"
-              className="mobile-nav__btn mobile-nav__toggler"
-              aria-label="Open menu"
-              onClick={changeMobileDrawerTwoStatus}
-            >
-              <span></span>
-              <span></span>
-              <span></span>
-            </button>
           </div>
         </div>
       </div>

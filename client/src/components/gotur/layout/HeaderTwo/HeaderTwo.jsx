@@ -5,7 +5,7 @@ import GetInTouchNavLink from "../../common/GetInTouchNavLink";
 import { navItems } from "../../../../data/navItems";
 import useStore from "../../../../store/useStore";
 
-import logo from "../../../../assets/images/logo-dark.png"
+import logo from "../../../../assets/images/logo-dark.png";
 
 const HeaderTwo = () => {
   const location = useLocation();
@@ -63,44 +63,49 @@ const HeaderTwo = () => {
     <header className="main-header main-header--two sticky-header sticky-header--normal">
       <div className="container-fluid">
         <div className="main-header__inner">
-          {/* LOGO */}
-          <div className="main-header__logo logo-retina">
-            <Link to="/">
-              <img
-                src={logo}
-                alt="Gotur"
-                width={160}
-                height={45}
-              />
-            </Link>
+          <div className="main-header__brand">
+            <div className="main-header__logo logo-retina">
+              <Link to="/">
+                <img src={logo} alt="Booking Lanka" width={160} height={45} />
+              </Link>
+            </div>
+
+            <button
+              type="button"
+              className="mobile-nav__btn mobile-nav__toggler"
+              aria-label="Open menu"
+              onClick={changeMobileDrawerTwoStatus}
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
           </div>
 
-          {/* NAV */}
-            <nav className="main-header__nav main-header__nav--two main-menu">
+          <nav className="main-header__nav main-header__nav--two main-menu">
+            <ul className="main-menu__list">
+              <li>
+                <Link to="/">Home</Link>
+              </li>
 
-              <ul className="main-menu__list">
-                <li className="dropdown megamenu">
-                  <Link to="/">Home</Link> 
-                  
-                
+              {dynamicNavItems.map((item) => (
+                <li
+                  key={item.id}
+                  className={`${item.subMenu ? "dropdown" : ""} ${
+                    item.link &&
+                    item.link !== "/#properties" &&
+                    location.pathname.includes(item.link)
+                      ? "current"
+                      : ""
+                  }`}
+                >
+                  <Link to={item.link || "#"}>{item.title}</Link>
+                  {item.subMenu && renderSubMenu(item.subMenu)}
                 </li>
+              ))}
+            </ul>
+          </nav>
 
-                {dynamicNavItems.map((item) => (
-                  <li
-                    key={item.id}
-                    className={`${item.subMenu ? "dropdown" : ""} ${
-                      item.link && location.pathname.includes(item.link) ? "current" : ""
-                    }`}
-                  >
-                    <Link to={item.link || "#"}>{item.title}</Link>
-                    {item.subMenu && renderSubMenu(item.subMenu)}
-                  </li>
-                ))}
-              </ul>
-            </nav>
-
-
-          {/* RIGHT ACTIONS */}
           <div className="main-header__right">
             <GetInTouchNavLink className="gotur-btn main-header__btn" />
 
@@ -115,17 +120,6 @@ const HeaderTwo = () => {
                 <Link to="/ai-planner">Start Planning</Link>
               </div>
             </div>
-
-            <button
-              type="button"
-              className="mobile-nav__btn mobile-nav__toggler"
-              aria-label="Open menu"
-              onClick={changeMobileDrawerTwoStatus}
-            >
-              <span></span>
-              <span></span>
-              <span></span>
-            </button>
           </div>
         </div>
       </div>

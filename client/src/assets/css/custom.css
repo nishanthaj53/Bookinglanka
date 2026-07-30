@@ -403,3 +403,80 @@ body.rtl .main-slider-one__destinations__hover {
   cursor: pointer;
   color: var(--gotur-white, #fff);
 }
+
+/* Header brand: logo + hamburger together on mobile */
+.main-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.main-header__brand .mobile-nav__btn {
+  margin-left: 0;
+}
+
+/* Keep Get in touch visible and right-aligned on tablet/mobile */
+@media (max-width: 1570px) {
+  .main-header--two .main-header__btn {
+    display: inline-flex !important;
+    align-items: center;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 1199px) {
+  .main-header--two .main-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  .main-header--two .main-header__nav {
+    display: none;
+  }
+
+  .main-header--two .main-header__right {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .main-header--two .main-header__btn {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  .main-header--two .main-header__call {
+    display: none !important;
+  }
+
+  .main-header--two .mobile-nav__btn {
+    display: flex;
+  }
+
+  .main-header--two .main-header__logo {
+    padding: 12px 16px 12px 0;
+  }
+
+  .main-header--two .main-header__logo img {
+    width: 120px;
+    height: auto;
+  }
+}
+
+@media (max-width: 575px) {
+  .main-header--two .main-header__btn {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .main-header--two .main-header__btn i {
+    display: none;
+  }
+
+  .main-header--two .main-header__logo img {
+    width: 100px;
+  }
+}

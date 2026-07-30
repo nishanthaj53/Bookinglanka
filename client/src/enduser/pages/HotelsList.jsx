@@ -50,6 +50,17 @@ export default function HotelsList() {
     fetchHotels();
   }, []);
 
+  useEffect(() => {
+    if (window.location.hash !== "#properties") return;
+    const timer = setTimeout(() => {
+      document.getElementById("properties")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [loading]);
+
   return (
     <Layout>
       {/* ===== HOME-2 HEADER STACK ===== */}

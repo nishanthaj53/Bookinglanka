@@ -96,7 +96,7 @@ export default function HotelListingSection({
   );
 
   return (
-    <section className="tour-listing-page section-space">
+    <section className="tour-listing-page section-space" id="properties">
       <Container>
         {/* FILTER UI – native inputs so it works without option lists */}
         <div className="listing-from">
