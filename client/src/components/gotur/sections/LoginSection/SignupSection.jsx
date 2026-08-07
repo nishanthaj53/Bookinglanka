@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Form } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { signup } from "../../../../services/auth";
 import PasswordVisibilityToggle from "../../../common/PasswordVisibilityToggle";
 
@@ -11,37 +11,110 @@ export default function SignupSection() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [registeredEmail, setRegisteredEmail] = useState("");
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendMessage, setResendMessage] = useState("");
+  const [error, setError] = useState("");
 
   const { register, handleSubmit } = useForm();
 
   const onSubmit = async (data) => {
     if (data.password !== data.confirmPassword) {
-      alert("Password and confirm password must match.");
+      setError("Password and confirm password must match.");
       return;
     }
     setLoading(true);
+    setError("");
+    setResendMessage("");
     try {
       const res = await signup(data.email, data.password);
-
-      localStorage.setItem("accessToken", res.tokens.accessToken);
-      localStorage.setItem("refreshToken", res.tokens.refreshToken);
-
-      alert("Signup successful!");
-      navigate("/dashboard", { replace: true });
+      setRegisteredEmail(res.user?.email || data.email);
     } catch (err) {
-      alert("Signup failed: " + err.message);
+      setError(err.message || "Signup failed");
     } finally {
       setLoading(false);
     }
   };
+
+  const onResend = async () => {
+    if (!registeredEmail) return;
+    setResendLoading(true);
+    setResendMessage("");
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/resend-verification`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: registeredEmail, portal: "user" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not resend email");
+      setResendMessage(data.message || "Verification email sent.");
+    } catch (err) {
+      setResendMessage(err.message || "Could not resend email");
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
+  if (registeredEmail) {
+    return (
+      <section className="login-page section-space">
+        <div className="container">
+          <div className="row gutter-y-40 align-items-center">
+            <div className="col-lg-6">
+              <div className="login-page__thumb">
+                <img src={SIGNUP_HERO} alt="Sri Lanka tourism" />
+              </div>
+            </div>
+            <div className="col-lg-6">
+              <div className="login-page__content">
+                <div className="login-page__main-tab-box tabs-box">
+                  <div className="login-page__top">
+                    <div className="login-page__top__left">
+                      <h2 className="login-page__top__section-title">Check your email</h2>
+                      <p className="login-page__top__section-subtitle">
+                        We sent a verification link to activate your account
+                      </p>
+                    </div>
+                  </div>
+                  <p style={{ lineHeight: 1.7, marginBottom: 16 }}>
+                    Open the email sent to <strong>{registeredEmail}</strong> and click
+                    <strong> Verify email address</strong>. After verifying, you can sign in.
+                  </p>
+                  <div className="login-page__input-box">
+                    <button
+                      type="button"
+                      className="gotur-btn w-100"
+                      disabled={resendLoading}
+                      onClick={onResend}
+                    >
+                      {resendLoading ? "Sending…" : "Resend verification email"}
+                    </button>
+                  </div>
+                  {!!resendMessage && (
+                    <p style={{ color: "#15803d", marginTop: 12 }}>{resendMessage}</p>
+                  )}
+                  <div className="login-page__divider" />
+                  <p className="login-page__form__text text-center">
+                    Already verified?{" "}
+                    <Link to="/login" className="login-page__signup-link">
+                      Sign in
+                    </Link>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="login-page section-space">
       <div className="container">
         <div className="row gutter-y-40 align-items-center">
 
-          {/* LEFT IMAGE */}
           <div className="col-lg-6">
             <div className="login-page__thumb">
               <img
@@ -51,7 +124,6 @@ export default function SignupSection() {
             </div>
           </div>
 
-          {/* RIGHT FORM */}
           <div className="col-lg-6">
             <div className="login-page__content">
               <div className="login-page__main-tab-box tabs-box">
@@ -70,7 +142,6 @@ export default function SignupSection() {
                 <Form onSubmit={handleSubmit(onSubmit)}>
                   <div className="login-page__group">
 
-                    {/* EMAIL */}
                     <div className="login-page__input-box">
                       <i className="icon-email"></i>
                       <input
@@ -80,7 +151,6 @@ export default function SignupSection() {
                       />
                     </div>
 
-                    {/* PASSWORD */}
                     <div className="login-page__input-box login-page__input-box--password">
                       <i className="icon-padlock"></i>
                       <input
@@ -95,7 +165,6 @@ export default function SignupSection() {
                       />
                     </div>
 
-                    {/* CONFIRM PASSWORD */}
                     <div className="login-page__input-box login-page__input-box--password">
                       <i className="icon-padlock"></i>
                       <input
@@ -110,7 +179,6 @@ export default function SignupSection() {
                       />
                     </div>
 
-                    {/* TERMS */}
                     <div className="login-page__input-box login-page__input-box--bottom">
                       <div className="login-page__input-box__inner">
                         <input id="terms" type="checkbox" required />
@@ -120,7 +188,6 @@ export default function SignupSection() {
                       </div>
                     </div>
 
-                    {/* BUTTON */}
                     <div className="login-page__input-box">
                       <button
                         type="submit"
@@ -134,7 +201,8 @@ export default function SignupSection() {
                   </div>
                 </Form>
 
-                {/* LOGIN LINK */}
+                {!!error && <p style={{ color: "red", marginTop: 10 }}>{error}</p>}
+
                 <p className="login-page__form__text">
                   Already registered?{" "}
                   <Link to="/login" className="text-success">

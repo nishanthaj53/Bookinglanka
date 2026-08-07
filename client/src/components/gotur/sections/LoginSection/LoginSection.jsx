@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { Form } from "react-bootstrap";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
-import { login } from "../../../../services/auth";
+import { login, resendVerification } from "../../../../services/auth";
 import { useAuthFeedbackModal } from "../../../../hooks/useAuthFeedbackModal";
 import PasswordVisibilityToggle from "../../../common/PasswordVisibilityToggle";
 
@@ -64,6 +64,34 @@ export default function LoginSection() {
           confirmLabel: "Continue",
           mustConfirm: true,
           onConfirm: () => navigate(err.redirectPath, { replace: true }),
+        });
+      } else if (err.code === "EMAIL_NOT_VERIFIED") {
+        showFeedback({
+          variant: "warning",
+          title: "Verify your email",
+          message:
+            err.message ||
+            "Please verify your email before signing in.",
+          detail:
+            "Check your inbox for the verification link, or request a new one.",
+          confirmLabel: "Resend verification email",
+          mustConfirm: true,
+          onConfirm: async () => {
+            try {
+              await resendVerification(err.email || "", "user");
+              showFeedback({
+                variant: "success",
+                title: "Email sent",
+                message:
+                  "If your account is not yet verified, a new verification link has been sent.",
+              });
+            } catch (resendErr) {
+              showFeedback({
+                variant: "error",
+                message: resendErr.message || "Could not resend verification email.",
+              });
+            }
+          },
         });
       } else {
         showFeedback({
@@ -147,7 +175,7 @@ export default function LoginSection() {
                             <label htmlFor="rememberMe">Remember me</label>
                           </div>
 
-                          <Link to="#" className="login-page__form__forgot">
+                          <Link to="/forgot-password" className="login-page__form__forgot">
                             Forgot password?
                           </Link>
                         </div>

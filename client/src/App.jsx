@@ -17,6 +17,8 @@ import AboutPage from "./enduser/pages/About";
 import LoginDesign from "./enduser/pages/LoginDesign"; 
 import SignupDesign from "./enduser/pages/SignupDesign";
 import ResetPasswordPage from "./enduser/pages/ResetPasswordPage";
+import ForgotPasswordPage from "./enduser/pages/ForgotPasswordPage";
+import VerifyEmailPage from "./enduser/pages/VerifyEmailPage";
 import Contact from "./enduser/pages/Contact";
 import AccountEntry from "./enduser/pages/AccountEntry";
 import DestinationDetailsPage from "./enduser/pages/DestinationDetailsPage";
@@ -68,6 +70,8 @@ export default function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/account" element={<AccountEntry />} />
         <Route path="/signup" element={<SignupDesign />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/destinations" element={<DestinationsPage />} />
         <Route path="/ai-planner" element={<AiPlannerPage />} />

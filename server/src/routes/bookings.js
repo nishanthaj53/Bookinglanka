@@ -341,7 +341,7 @@ router.post('/:id/pay-success', authenticateUser, async (req, res) => {
     const paidBooking = await prisma.booking.update({
       where: { id: req.params.id },
       data: { status: 'PAID' },
-      include: { hotel: true, user: true },
+      include: { hotel: true, user: true, roomType: true, payment: true },
     })
 
     // Send confirmation email (after payment)

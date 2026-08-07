@@ -3,21 +3,35 @@ import bcrypt from 'bcrypt'
 import { prisma } from '../../db/client.js'
 import { issueAccessToken, issueRefreshToken } from '../../utils/token.js'
 import { PORTAL_ACCESS_DENIED_MESSAGE } from '../../constants/portalAuth.js'
+import {
+  createEmailVerificationToken,
+  sendEmailVerificationEmail,
+} from '../../services/emailService.js'
 
 const router = express.Router()
 
-// ✅ MANAGER SIGNUP (role is auto-assigned)
+async function issueVerificationEmail(user) {
+  const token = createEmailVerificationToken(user, 'manager')
+  try {
+    await sendEmailVerificationEmail(user.email, token, 'manager')
+  } catch (e) {
+    console.error('Manager verification email failed:', e?.message || e)
+  }
+}
+
+// MANAGER SIGNUP (role is auto-assigned)
 router.post('/signup', async (req, res) => {
   try {
     const { email, password, displayName } = req.body || {}
-    if (!email || !password) {
+    const normalizedEmail = String(email || '').trim().toLowerCase()
+
+    if (!normalizedEmail || !password) {
       return res.status(400).json({ error: 'Email and password are required' })
     }
 
-    const existing = await prisma.user.findUnique({ where: { email } })
+    const existing = await prisma.user.findUnique({ where: { email: normalizedEmail } })
 
     if (existing) {
-      // Prevent multiple manager registrations with same email
       const ok = await bcrypt.compare(password, existing.password)
       if (!ok) {
         return res.status(400).json({ error: 'Invalid credentials for upgrade' })
@@ -27,43 +41,48 @@ router.post('/signup', async (req, res) => {
         return res.status(409).json({ error: 'This account is already registered as a manager' })
       }
 
-      // Upgrade user to manager
       const updated = await prisma.user.update({
-        where: { email },
+        where: { email: normalizedEmail },
         data: {
           roles: [...existing.roles, 'MANAGER'],
           displayName: displayName ?? existing.displayName,
         },
       })
 
-      const accessToken = issueAccessToken(updated)
-      const refreshToken = issueRefreshToken(updated)
+      if (!updated.emailVerified) {
+        await issueVerificationEmail(updated)
+        return res.json({
+          message:
+            'Manager role added. Please verify your email before signing in to the manager portal.',
+          requiresVerification: true,
+          user: { id: updated.id, email: updated.email, roles: updated.roles },
+        })
+      }
 
       return res.json({
-        message: 'Upgraded to Manager successfully',
+        message: 'Upgraded to Manager successfully. You can now sign in.',
         user: { id: updated.id, email: updated.email, roles: updated.roles },
-        tokens: { accessToken, refreshToken },
       })
     }
 
-    // ✅ Create new manager (auto-role)
     const hash = await bcrypt.hash(password, 10)
     const user = await prisma.user.create({
       data: {
-        email,
+        email: normalizedEmail,
         password: hash,
         displayName: displayName ?? null,
         roles: ['MANAGER'],
+        emailVerified: false,
       },
     })
 
-    const accessToken = issueAccessToken(user)
-    const refreshToken = issueRefreshToken(user)
+    await issueVerificationEmail(user)
 
     res.status(201).json({
-      message: 'Manager registered successfully',
+      message:
+        'Manager account created. Please check your email to verify your address before signing in.',
+      requiresVerification: true,
       user: { id: user.id, email: user.email, roles: user.roles },
-      tokens: { accessToken, refreshToken },
     })
   } catch (err) {
     console.error('Manager signup error:', err)
@@ -71,15 +90,17 @@ router.post('/signup', async (req, res) => {
   }
 })
 
-// ✅ MANAGER LOGIN
+// MANAGER LOGIN
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body || {}
-    if (!email || !password) {
+    const normalizedEmail = String(email || '').trim().toLowerCase()
+
+    if (!normalizedEmail || !password) {
       return res.status(400).json({ error: 'Email and password are required' })
     }
 
-    const user = await prisma.user.findUnique({ where: { email } })
+    const user = await prisma.user.findUnique({ where: { email: normalizedEmail } })
     if (!user) return res.status(401).json({ error: 'Invalid email or password' })
 
     const ok = await bcrypt.compare(password, user.password)
@@ -92,6 +113,14 @@ router.post('/login', async (req, res) => {
       return res.status(403).json({
         error: PORTAL_ACCESS_DENIED_MESSAGE,
         redirectPath,
+      })
+    }
+
+    if (!user.emailVerified) {
+      return res.status(403).json({
+        error: 'Please verify your email before signing in. Check your inbox for the verification link.',
+        code: 'EMAIL_NOT_VERIFIED',
+        email: user.email,
       })
     }
 

@@ -118,7 +118,7 @@ export default function AdminLogin() {
                       <input id="adminRememberMe" type="checkbox" />
                       <label htmlFor="adminRememberMe">Remember me</label>
                     </div>
-                    <Link to="#" className="login-page__form__forgot">
+                    <Link to="/forgot-password" className="login-page__form__forgot">
                       Forgot password?
                     </Link>
                   </div>

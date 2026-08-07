@@ -25,6 +25,7 @@ router.post("/signup", async (req, res) => {
         email,
         password: hashed,
         roles: ["ADMIN"],
+        emailVerified: true,
       },
     })
 

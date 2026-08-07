@@ -18,6 +18,7 @@ model User {
   avatarUrl   String?
   displayName String?
   phone       String?
+  emailVerified Boolean      @default(false)
   audit       AuditEvent[]   @relation("AuditUser")
   bookings    Booking[]
   hotelsOwned Hotel[]        @relation("HotelOwner")

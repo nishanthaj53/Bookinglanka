@@ -262,7 +262,12 @@ export async function finalizePaidBooking({
 }) {
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
-    include: { user: true, hotel: true, payment: true },
+    include: {
+      user: true,
+      hotel: true,
+      roomType: true,
+      payment: true,
+    },
   });
   if (!booking) return null;
   if (booking.status === "PAID") return booking;
@@ -270,7 +275,12 @@ export async function finalizePaidBooking({
   const paid = await prisma.booking.update({
     where: { id: bookingId },
     data: { status: "PAID" },
-    include: { user: true, hotel: true },
+    include: {
+      user: true,
+      hotel: true,
+      roomType: true,
+      payment: true,
+    },
   });
 
   if (booking.payment) {

@@ -1,35 +1,41 @@
 import nodemailer from 'nodemailer'
+import jwt from 'jsonwebtoken'
+import { generateBookingVoucherPdf } from './bookingVoucherPdf.js'
+import {
+  appBaseUrl,
+  bookingReference,
+  fmtDate,
+  fmtMoney,
+  wrapEmailHtml,
+} from './emailTemplates.js'
 
-/**
- * Configure reusable Nodemailer transporter
- */
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
   port: Number(process.env.EMAIL_PORT || 465),
-  secure: process.env.EMAIL_SECURE === 'true', // true for 465, false for 587
+  secure: process.env.EMAIL_SECURE === 'true',
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
 })
 
-function appBaseUrl() {
-  return (
-    process.env.FRONTEND_URL ||
-    process.env.CORS_ORIGIN ||
-    'http://localhost:5173'
-  ).replace(/\/$/, '')
-}
-
-function fmtDate(v) {
-  if (!v) return '-'
-  return new Date(v).toDateString()
+export function createEmailVerificationToken(user, portal = 'user') {
+  return jwt.sign(
+    {
+      sub: user.id,
+      email: user.email,
+      purpose: 'email-verify',
+      portal,
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: '24h' }
+  )
 }
 
 /**
  * Send a generic email (HTML or plain text)
  */
-export async function sendEmail({ to, subject, text, html }) {
+export async function sendEmail({ to, subject, text, html, attachments }) {
   try {
     const info = await transporter.sendMail({
       from: process.env.EMAIL_FROM,
@@ -37,6 +43,7 @@ export async function sendEmail({ to, subject, text, html }) {
       subject,
       text,
       html,
+      attachments,
     })
     console.log(`📧 Email sent to ${to}: ${info.messageId}`)
     return info
@@ -46,121 +53,191 @@ export async function sendEmail({ to, subject, text, html }) {
   }
 }
 
-/**
- * Example: send booking confirmation email
- */
-export async function sendBookingConfirmationEmail(userEmail, bookingDetails) {
-  const { id, hotel, checkIn, checkOut, totalAmount, currency } = bookingDetails
+export async function sendEmailVerificationEmail(userEmail, token, portal = 'user') {
+  const verifyUrl = `${appBaseUrl()}/verify-email?token=${encodeURIComponent(token)}&portal=${encodeURIComponent(portal)}`
+  const portalLabel = portal === 'manager' ? 'hotel manager' : 'traveller'
+  const loginPath = portal === 'manager' ? '/manager/login' : '/login'
 
-  const subject = `Your Booking Confirmation – ${hotel.name}`
-  const html = `
-    <h2>Booking Confirmed ✅</h2>
-    <p>Thank you for booking with <b>BookingLanka.com</b>.</p>
-    <p>Booking ID: <b>${id}</b></p>
-    <p>Hotel: <b>${hotel.name}</b></p>
-    <p>Check-in: ${fmtDate(checkIn)}</p>
-    <p>Check-out: ${fmtDate(checkOut)}</p>
-    <p>Total: ${currency} ${totalAmount}</p>
-    <p><a href="${appBaseUrl()}/dashboard/bookings">View my bookings</a></p>
-    <p>We look forward to your stay! 🌴</p>
-  `
+  const subject = 'Verify your Booking Lanka email'
+  const html = wrapEmailHtml({
+    title: 'Confirm your email',
+    preheader: 'One quick step to activate your Booking Lanka account.',
+    bodyHtml: `
+      <p>Welcome to <strong>Booking Lanka</strong>!</p>
+      <p>Please confirm your email address to activate your ${portalLabel} account and sign in securely.</p>
+      <p style="margin:18px 0;padding:16px;background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;">
+        <strong>Email:</strong> ${userEmail}<br/>
+        <strong>Link expires in:</strong> 24 hours
+      </p>
+      <p>If you did not create this account, you can safely ignore this message.</p>
+    `,
+    ctaLabel: 'Verify email address',
+    ctaUrl: verifyUrl,
+  })
+
+  const text = `Verify your Booking Lanka email: ${verifyUrl}\nAfter verification, sign in at ${appBaseUrl()}${loginPath}`
+
+  await sendEmail({ to: userEmail, subject, html, text })
+}
+
+export async function sendBookingConfirmationEmail(userEmail, bookingDetails) {
+  const booking = bookingDetails
+  const ref = bookingReference(booking.id)
+  const hotelName = booking.hotel?.name || 'Hotel'
+  const roomName = booking.roomType?.name || 'Room'
+  const subject = `Booking confirmed — ${hotelName} (${ref})`
+
+  let pdfBuffer
+  try {
+    pdfBuffer = await generateBookingVoucherPdf(booking)
+  } catch (err) {
+    console.error('PDF voucher generation failed:', err.message)
+  }
+
+  const html = wrapEmailHtml({
+    title: 'Your booking is confirmed',
+    preheader: `${hotelName} • ${fmtDate(booking.checkIn)} to ${fmtDate(booking.checkOut)}`,
+    bodyHtml: `
+      <p>Thank you for booking with <strong>Booking Lanka</strong>. Your payment was received successfully.</p>
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:20px 0;background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;">
+        <tr><td style="padding:16px 18px;">
+          <p style="margin:0 0 8px;"><strong>Reference:</strong> ${ref}</p>
+          <p style="margin:0 0 8px;"><strong>Hotel:</strong> ${hotelName}</p>
+          <p style="margin:0 0 8px;"><strong>Room:</strong> ${roomName}</p>
+          <p style="margin:0 0 8px;"><strong>Stay:</strong> ${fmtDate(booking.checkIn)} → ${fmtDate(booking.checkOut)}</p>
+          <p style="margin:0 0 8px;"><strong>Guests:</strong> ${booking.guests ?? 1} · <strong>Rooms:</strong> ${booking.rooms ?? 1}</p>
+          <p style="margin:0;"><strong>Paid:</strong> ${fmtMoney(booking.totalAmount, booking.currency)}</p>
+        </td></tr>
+      </table>
+      <p>A printable booking reference PDF is attached. Show it at hotel reception along with your photo ID.</p>
+    `,
+    ctaLabel: 'View my bookings',
+    ctaUrl: `${appBaseUrl()}/dashboard/bookings`,
+  })
+
+  const attachments = pdfBuffer
+    ? [
+        {
+          filename: `BookingLanka-Reference-${ref}.pdf`,
+          content: pdfBuffer,
+          contentType: 'application/pdf',
+        },
+      ]
+    : undefined
+
   await sendEmail({
     to: userEmail,
     subject,
     html,
+    attachments,
   })
 }
 
-/**
- * Booking cancellation notification
- */
 export async function sendBookingCancellationEmail(userEmail, bookingDetails, reasonText) {
   const { id, hotel, checkIn, checkOut } = bookingDetails
-  const subject = `Booking Cancelled – ${hotel?.name || 'Booking Lanka'}`
-  const html = `
-    <h2>Booking Cancelled</h2>
-    <p>Your booking request has been cancelled.</p>
-    <p>Booking ID: <b>${id}</b></p>
-    <p>Hotel: <b>${hotel?.name || '-'}</b></p>
-    <p>Check-in: ${fmtDate(checkIn)}</p>
-    <p>Check-out: ${fmtDate(checkOut)}</p>
-    <p>Reason: <b>${reasonText || 'No space available'}</b></p>
-    <p><a href="${appBaseUrl()}/dashboard/bookings">View bookings</a></p>
-  `
-  await sendEmail({
-    to: userEmail,
-    subject,
-    html,
+  const subject = `Booking cancelled — ${hotel?.name || 'Booking Lanka'}`
+  const html = wrapEmailHtml({
+    title: 'Booking cancelled',
+    bodyHtml: `
+      <p>Your booking request has been cancelled.</p>
+      <p><strong>Booking ID:</strong> ${id}</p>
+      <p><strong>Hotel:</strong> ${hotel?.name || '-'}</p>
+      <p><strong>Check-in:</strong> ${fmtDate(checkIn)}</p>
+      <p><strong>Check-out:</strong> ${fmtDate(checkOut)}</p>
+      <p><strong>Reason:</strong> ${reasonText || 'No space available'}</p>
+    `,
+    ctaLabel: 'View bookings',
+    ctaUrl: `${appBaseUrl()}/dashboard/bookings`,
   })
+  await sendEmail({ to: userEmail, subject, html })
 }
 
 export async function sendPasswordResetEmail(userEmail, resetToken) {
   const resetUrl = `${appBaseUrl()}/reset-password?token=${encodeURIComponent(resetToken)}`
-  const subject = 'Reset your BookingLanka password'
-  const html = `
-    <h2>Password reset request</h2>
-    <p>We received a request to reset your password.</p>
-    <p><a href="${resetUrl}">Click here to reset password</a></p>
-    <p>If you did not request this, you can ignore this email.</p>
-    <p>This link expires in 30 minutes.</p>
-  `
+  const subject = 'Reset your Booking Lanka password'
+  const html = wrapEmailHtml({
+    title: 'Reset your password',
+    preheader: 'Use this secure link to choose a new password.',
+    bodyHtml: `
+      <p>We received a request to reset the password for <strong>${userEmail}</strong>.</p>
+      <p>Click the button below to choose a new password. This link expires in <strong>30 minutes</strong>.</p>
+      <p>If you did not request a password reset, you can ignore this email — your password will stay the same.</p>
+    `,
+    ctaLabel: 'Reset password',
+    ctaUrl: resetUrl,
+  })
   await sendEmail({ to: userEmail, subject, html })
 }
 
 export async function sendBookingAcceptedEmail(userEmail, booking) {
-  const subject = `Booking accepted – ${booking.hotel?.name || 'Booking Lanka'}`
-  const html = `
-    <h2>Your booking request was accepted ✅</h2>
-    <p>Booking ID: <b>${booking.id}</b></p>
-    <p>Hotel: <b>${booking.hotel?.name || '-'}</b></p>
-    <p>Check-in: ${fmtDate(booking.checkIn)}</p>
-    <p>Check-out: ${fmtDate(booking.checkOut)}</p>
-    <p>Please complete your payment to confirm the booking.</p>
-    <p><a href="${appBaseUrl()}/dashboard/bookings">Go to bookings</a></p>
-  `
+  const subject = `Booking accepted — ${booking.hotel?.name || 'Booking Lanka'}`
+  const html = wrapEmailHtml({
+    title: 'Booking request accepted',
+    bodyHtml: `
+      <p>Great news — the hotel accepted your booking request.</p>
+      <p><strong>Booking ID:</strong> ${booking.id}</p>
+      <p><strong>Hotel:</strong> ${booking.hotel?.name || '-'}</p>
+      <p><strong>Check-in:</strong> ${fmtDate(booking.checkIn)}</p>
+      <p><strong>Check-out:</strong> ${fmtDate(booking.checkOut)}</p>
+      <p>Please complete payment to confirm your reservation.</p>
+    `,
+    ctaLabel: 'Complete payment',
+    ctaUrl: `${appBaseUrl()}/dashboard/bookings`,
+  })
   await sendEmail({ to: userEmail, subject, html })
 }
 
 export async function sendBookingDecisionDeclinedEmail(userEmail, booking) {
-  const subject = `Booking declined – ${booking.hotel?.name || 'Booking Lanka'}`
-  const html = `
-    <h2>Your booking request was declined</h2>
-    <p>Booking ID: <b>${booking.id}</b></p>
-    <p>Hotel: <b>${booking.hotel?.name || '-'}</b></p>
-    <p>Check-in: ${fmtDate(booking.checkIn)}</p>
-    <p>Check-out: ${fmtDate(booking.checkOut)}</p>
-    <p>You may choose other dates or hotels.</p>
-    <p><a href="${appBaseUrl()}/">Browse hotels</a></p>
-  `
+  const subject = `Booking declined — ${booking.hotel?.name || 'Booking Lanka'}`
+  const html = wrapEmailHtml({
+    title: 'Booking request declined',
+    bodyHtml: `
+      <p>Unfortunately, the hotel could not accept your booking request.</p>
+      <p><strong>Booking ID:</strong> ${booking.id}</p>
+      <p><strong>Hotel:</strong> ${booking.hotel?.name || '-'}</p>
+      <p><strong>Check-in:</strong> ${fmtDate(booking.checkIn)}</p>
+      <p><strong>Check-out:</strong> ${fmtDate(booking.checkOut)}</p>
+      <p>You can browse other hotels and dates on Booking Lanka.</p>
+    `,
+    ctaLabel: 'Browse hotels',
+    ctaUrl: `${appBaseUrl()}/`,
+  })
   await sendEmail({ to: userEmail, subject, html })
 }
 
 export async function sendBookingStatusUpdateEmail(userEmail, booking, nextStatus) {
-  const subject = `Booking status update – ${booking.hotel?.name || 'Booking Lanka'}`
+  const subject = `Booking status update — ${booking.hotel?.name || 'Booking Lanka'}`
   const statusText =
     nextStatus === 'CHECKED_IN'
       ? 'You are checked in. Have a great stay!'
       : nextStatus === 'COMPLETED'
-      ? 'Your stay is marked as completed. Thank you!'
-      : `New status: ${nextStatus}`
-  const html = `
-    <h2>Booking status updated</h2>
-    <p>Booking ID: <b>${booking.id}</b></p>
-    <p>Hotel: <b>${booking.hotel?.name || '-'}</b></p>
-    <p>${statusText}</p>
-    <p><a href="${appBaseUrl()}/dashboard/bookings">View bookings</a></p>
-  `
+        ? 'Your stay is marked as completed. Thank you!'
+        : `New status: ${nextStatus}`
+  const html = wrapEmailHtml({
+    title: 'Booking status updated',
+    bodyHtml: `
+      <p><strong>Booking ID:</strong> ${booking.id}</p>
+      <p><strong>Hotel:</strong> ${booking.hotel?.name || '-'}</p>
+      <p>${statusText}</p>
+    `,
+    ctaLabel: 'View bookings',
+    ctaUrl: `${appBaseUrl()}/dashboard/bookings`,
+  })
   await sendEmail({ to: userEmail, subject, html })
 }
 
 export async function sendRoomAvailableEmail(userEmail, hotelName, roomName, startDate, endDate) {
-  const subject = `Room available again – ${hotelName}`
-  const html = `
-    <h2>Good news! Room is available again 🎉</h2>
-    <p>Hotel: <b>${hotelName}</b></p>
-    <p>Room: <b>${roomName || 'Room'}</b></p>
-    <p>Available range: ${fmtDate(startDate)} to ${fmtDate(endDate)}</p>
-    <p><a href="${appBaseUrl()}/">Book now</a></p>
-  `
+  const subject = `Room available again — ${hotelName}`
+  const html = wrapEmailHtml({
+    title: 'Room is available again',
+    bodyHtml: `
+      <p>Good news — a room you were interested in is available again.</p>
+      <p><strong>Hotel:</strong> ${hotelName}</p>
+      <p><strong>Room:</strong> ${roomName || 'Room'}</p>
+      <p><strong>Available:</strong> ${fmtDate(startDate)} to ${fmtDate(endDate)}</p>
+    `,
+    ctaLabel: 'Book now',
+    ctaUrl: `${appBaseUrl()}/`,
+  })
   await sendEmail({ to: userEmail, subject, html })
 }

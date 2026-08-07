@@ -24,6 +24,38 @@ export default function ManagerLogin() {
       });
       const data = await res.json();
       if (!res.ok) {
+        if (data.code === "EMAIL_NOT_VERIFIED") {
+          showFeedback({
+            variant: "warning",
+            title: "Verify your email",
+            message: data.error || "Please verify your email before signing in.",
+            detail: "Check your inbox for the manager verification link.",
+            confirmLabel: "Resend verification email",
+            mustConfirm: true,
+            onConfirm: async () => {
+              try {
+                const r = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/resend-verification`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ email: data.email || email, portal: "manager" }),
+                });
+                const rd = await r.json();
+                if (!r.ok) throw new Error(rd.error || "Could not resend email");
+                showFeedback({
+                  variant: "success",
+                  title: "Email sent",
+                  message: rd.message || "Verification email sent if applicable.",
+                });
+              } catch (resendErr) {
+                showFeedback({
+                  variant: "error",
+                  message: resendErr.message || "Could not resend verification email.",
+                });
+              }
+            },
+          });
+          return;
+        }
         if (data.redirectPath) {
           showFeedback({
             variant: "warning",
@@ -118,7 +150,7 @@ export default function ManagerLogin() {
                       <input id="managerRememberMe" type="checkbox" />
                       <label htmlFor="managerRememberMe">Remember me</label>
                     </div>
-                    <Link to="#" className="login-page__form__forgot">
+                    <Link to="/forgot-password" className="login-page__form__forgot">
                       Forgot password?
                     </Link>
                   </div>
