@@ -13,12 +13,14 @@ import HeaderTwoCloned from "../../components/gotur/layout/HeaderTwoCloned/Heade
 import FooterOne from "../../components/gotur/layout/FooterOne/FooterOne";
 import Layout from "../../components/gotur/layout/Layout/Layout";
 import PageHeader from "../../components/gotur/sections/PageHeader/PageHeader";
+import { feedbackWarning, useFeedback } from "../../context/FeedbackContext";
 
 // Optional imports if you already have these components
 // import VideoModal from "../../components/common/VideoModal/VideoModal";
 // import FullWidthCalendar from "../../components/gotur/common/Calendar/Calendar";
 
 export default function HoteldetailUiPage() {
+  const { showFeedback } = useFeedback();
   const [checkInDate, setCheckInDate] = useState(null);
   const [checkOutDate, setCheckOutDate] = useState(null);
   const [guestCount, setGuestCount] = useState(1);
@@ -110,7 +112,7 @@ export default function HoteldetailUiPage() {
     e.preventDefault();
 
     if (!checkInDate || !checkOutDate) {
-      alert("Please select both check-in and check-out dates.");
+      feedbackWarning(showFeedback, "Please select both check-in and check-out dates.");
       return;
     }
 

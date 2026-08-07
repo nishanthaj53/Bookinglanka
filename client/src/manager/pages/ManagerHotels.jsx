@@ -3,6 +3,14 @@ import { Col, Row } from "react-bootstrap";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import apiClient, { BASE_URL } from "../../services/apiClient";
 import "../../components/dashboard/dashboard-pages.css";
+import {
+  apiErrorMessage,
+  askConfirm,
+  feedbackError,
+  feedbackSuccess,
+  feedbackWarning,
+  useFeedback,
+} from "../../context/FeedbackContext";
 
 function resolveHotelImageUrl(url) {
   if (!url) return null;
@@ -17,6 +25,7 @@ function resolveHotelImageUrl(url) {
  * @param {{ statusFilter: 'ACTIVE' | 'DRAFT' }} props
  */
 export default function ManagerHotels({ statusFilter }) {
+  const { showFeedback } = useFeedback();
   const { hotels, loading, refreshDashboard } = useOutletContext();
   const navigate = useNavigate();
   const [localLoading, setLocalLoading] = useState(false);
@@ -83,7 +92,7 @@ export default function ManagerHotels({ statusFilter }) {
 
   const handleUpdateImages = async (hotelId) => {
     if (images.length === 0) {
-      alert("Please select new images first");
+      feedbackWarning(showFeedback, "Please select new images first");
       return;
     }
     try {
@@ -94,12 +103,12 @@ export default function ManagerHotels({ statusFilter }) {
       await apiClient.put(`/manager/hotels/${hotelId}/images`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      alert("Hotel images updated successfully.");
+      feedbackSuccess(showFeedback, "Hotel images updated successfully.");
       resetUploadState();
       if (refreshDashboard) await refreshDashboard();
     } catch (err) {
       console.error("Update images error:", err);
-      alert(err.response?.data?.error || "Error updating hotel images");
+      feedbackError(showFeedback, apiErrorMessage(err, "Error updating hotel images"));
     } finally {
       setLocalLoading(false);
     }
@@ -107,7 +116,7 @@ export default function ManagerHotels({ statusFilter }) {
 
   const handleUpdateAmenityImages = async (hotelId) => {
     if (amenityImages.length === 0) {
-      alert("Please select amenity images first");
+      feedbackWarning(showFeedback, "Please select amenity images first");
       return;
     }
     try {
@@ -117,26 +126,32 @@ export default function ManagerHotels({ statusFilter }) {
       await apiClient.put(`/manager/hotels/${hotelId}/amenity-images`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      alert("Amenity images updated successfully.");
+      feedbackSuccess(showFeedback, "Amenity images updated successfully.");
       resetUploadState();
       if (refreshDashboard) await refreshDashboard();
     } catch (err) {
       console.error("Update amenity images error:", err);
-      alert(err.response?.data?.error || "Error updating amenity images");
+      feedbackError(showFeedback, apiErrorMessage(err, "Error updating amenity images"));
     } finally {
       setLocalLoading(false);
     }
   };
 
   const handleDeleteHotel = async (hotelId) => {
-    if (!window.confirm("Are you sure you want to delete this hotel?")) return;
+    const ok = await askConfirm(showFeedback, {
+      title: "Delete hotel",
+      message: "Are you sure you want to delete this hotel?",
+      confirmLabel: "Delete",
+      cancelLabel: "Cancel",
+    });
+    if (!ok) return;
     try {
       await apiClient.delete(`/manager/hotels/${hotelId}`);
-      alert("Hotel deleted successfully");
+      feedbackSuccess(showFeedback, "Hotel deleted successfully");
       if (refreshDashboard) await refreshDashboard();
     } catch (err) {
       console.error("Delete hotel error:", err);
-      alert(err.response?.data?.error || "Error deleting hotel");
+      feedbackError(showFeedback, apiErrorMessage(err, "Error deleting hotel"));
     }
   };
 

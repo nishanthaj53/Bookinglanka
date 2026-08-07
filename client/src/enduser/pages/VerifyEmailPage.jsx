@@ -2,10 +2,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import LoginPageLayout from '../../components/dashboard/LoginPageLayout'
 import { resendVerification, verifyEmail } from '../../services/auth'
+import { feedbackError, feedbackSuccess, useFeedback } from '../../context/FeedbackContext'
 
 const HERO = '/images/login/user-sri-lanka.jpg'
 
 export default function VerifyEmailPage() {
+  const { showFeedback } = useFeedback()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
 
@@ -19,11 +21,8 @@ export default function VerifyEmailPage() {
   )
 
   const [status, setStatus] = useState(token ? 'loading' : 'missing')
-  const [message, setMessage] = useState('')
-  const [error, setError] = useState('')
   const [resendEmail, setResendEmail] = useState('')
   const [resendLoading, setResendLoading] = useState(false)
-  const [resendMessage, setResendMessage] = useState('')
 
   const loginPath = portal === 'manager' ? '/manager/login' : '/login'
   const signupPath = portal === 'manager' ? '/manager/signup' : '/signup'
@@ -41,28 +40,34 @@ export default function VerifyEmailPage() {
         const data = await verifyEmail(token)
         if (cancelled) return
         setStatus('success')
-        setMessage(data.message || 'Email verified successfully.')
+        feedbackSuccess(showFeedback, data.message || 'Email verified successfully.', {
+          title: 'Email verified',
+          mustConfirm: true,
+          confirmLabel: 'Continue to login',
+          onConfirm: () => navigate(loginPath, { replace: true }),
+        })
       } catch (err) {
         if (cancelled) return
         setStatus('error')
-        setError(err.message || 'Verification failed')
+        feedbackError(showFeedback, err.message || 'Verification failed')
       }
     })()
 
     return () => {
       cancelled = true
     }
-  }, [token])
+  }, [token, showFeedback, navigate, loginPath])
 
   const onResend = async (e) => {
     e.preventDefault()
-    setResendMessage('')
     setResendLoading(true)
     try {
       const data = await resendVerification(resendEmail.trim(), portal)
-      setResendMessage(data.message || 'Verification email sent if applicable.')
+      feedbackSuccess(showFeedback, data.message || 'Verification email sent if applicable.', {
+        title: 'Email sent',
+      })
     } catch (err) {
-      setResendMessage(err.message || 'Could not resend email')
+      feedbackError(showFeedback, err.message || 'Could not resend email')
     } finally {
       setResendLoading(false)
     }
@@ -89,21 +94,6 @@ export default function VerifyEmailPage() {
             <p style={{ marginTop: 8 }}>Verifying your email address…</p>
           )}
 
-          {status === 'success' && (
-            <>
-              <p style={{ color: '#15803d', lineHeight: 1.7 }}>{message}</p>
-              <div className="login-page__input-box" style={{ marginTop: 16 }}>
-                <button
-                  type="button"
-                  className="gotur-btn w-100"
-                  onClick={() => navigate(loginPath, { replace: true })}
-                >
-                  Continue to login
-                </button>
-              </div>
-            </>
-          )}
-
           {(status === 'error' || status === 'missing') && (
             <>
               {status === 'missing' && (
@@ -111,7 +101,6 @@ export default function VerifyEmailPage() {
                   Open the verification link from your email, or request a new one below.
                 </p>
               )}
-              {!!error && <p style={{ color: '#b91c1c', lineHeight: 1.7 }}>{error}</p>}
 
               <form onSubmit={onResend} style={{ marginTop: 16 }}>
                 <div className="login-page__group">
@@ -136,12 +125,6 @@ export default function VerifyEmailPage() {
                   </div>
                 </div>
               </form>
-
-              {!!resendMessage && (
-                <p style={{ color: '#15803d', marginTop: 10, lineHeight: 1.6 }}>
-                  {resendMessage}
-                </p>
-              )}
             </>
           )}
 

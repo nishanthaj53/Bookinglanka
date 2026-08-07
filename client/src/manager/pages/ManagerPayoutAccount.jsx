@@ -2,8 +2,16 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import apiClient from "../../services/apiClient";
 import "../../components/dashboard/dashboard-pages.css";
+import {
+  apiErrorMessage,
+  feedbackError,
+  feedbackSuccess,
+  feedbackWarning,
+  useFeedback,
+} from "../../context/FeedbackContext";
 
 export default function ManagerPayoutAccount() {
+  const { showFeedback } = useFeedback();
   const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -29,7 +37,7 @@ export default function ManagerPayoutAccount() {
       });
     } catch (err) {
       console.error("Load payout account error:", err);
-      alert(err.response?.data?.error || "Failed to load payout account settings");
+      feedbackError(showFeedback, apiErrorMessage(err, "Failed to load payout account settings"));
     } finally {
       setLoading(false);
     }
@@ -48,7 +56,7 @@ export default function ManagerPayoutAccount() {
         await apiClient.post("/manager/payout-account/stripe/refresh");
         await loadAccount();
         if (stripeFlag === "return") {
-          alert("Stripe onboarding returned. Status refreshed.");
+          feedbackSuccess(showFeedback, "Stripe onboarding returned. Status refreshed.");
         }
       } catch (err) {
         console.error(err);
@@ -68,7 +76,7 @@ export default function ManagerPayoutAccount() {
   const onSaveBank = async (e) => {
     e.preventDefault();
     if (!form.accountId || String(form.accountId).trim().length < 6) {
-      alert("Please enter a valid account number (minimum 6 characters).");
+      feedbackWarning(showFeedback, "Please enter a valid account number (minimum 6 characters).");
       return;
     }
     try {
@@ -77,10 +85,10 @@ export default function ManagerPayoutAccount() {
         ...form,
         provider: "bank",
       });
-      alert("Bank payout details saved.");
+      feedbackSuccess(showFeedback, "Bank payout details saved.");
       await loadAccount();
     } catch (err) {
-      alert(err.response?.data?.error || "Failed to save payout account");
+      feedbackError(showFeedback, apiErrorMessage(err, "Failed to save payout account"));
     } finally {
       setSaving(false);
     }
@@ -94,9 +102,9 @@ export default function ManagerPayoutAccount() {
         window.location.href = data.url;
         return;
       }
-      alert("No onboarding URL returned");
+      feedbackWarning(showFeedback, "No onboarding URL returned");
     } catch (err) {
-      alert(err.response?.data?.error || "Failed to start Stripe Connect");
+      feedbackError(showFeedback, apiErrorMessage(err, "Failed to start Stripe Connect"));
     } finally {
       setConnecting(false);
     }
@@ -107,9 +115,9 @@ export default function ManagerPayoutAccount() {
       setConnecting(true);
       const { data } = await apiClient.post("/manager/payout-account/stripe/refresh");
       setAccount(data.account);
-      alert(data.message || "Stripe status updated");
+      feedbackSuccess(showFeedback, data.message || "Stripe status updated");
     } catch (err) {
-      alert(err.response?.data?.error || "Failed to refresh Stripe status");
+      feedbackError(showFeedback, apiErrorMessage(err, "Failed to refresh Stripe status"));
     } finally {
       setConnecting(false);
     }

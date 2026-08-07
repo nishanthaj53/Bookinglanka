@@ -19,7 +19,9 @@ export default function AuthFeedbackModal({
   message,
   detail,
   confirmLabel = "OK",
+  cancelLabel,
   onConfirm,
+  onCancel,
   /** When true, only the primary button dismisses (e.g. success or redirect). */
   mustConfirm = false,
 }) {
@@ -30,16 +32,23 @@ export default function AuthFeedbackModal({
     else onHide?.();
   };
 
+  const handleCancel = () => {
+    if (typeof onCancel === "function") onCancel();
+    else onHide?.();
+  };
+
+  const dismissible = !mustConfirm && !cancelLabel;
+
   return (
     <Modal
       show={show}
-      onHide={mustConfirm ? () => {} : onHide || (() => {})}
+      onHide={dismissible ? onHide || (() => {}) : () => {}}
       centered
       className="booking-lanka-auth-modal"
       contentClassName="booking-lanka-auth-modal__content"
       backdropClassName="booking-lanka-auth-modal__backdrop"
-      backdrop={mustConfirm ? "static" : true}
-      keyboard={!mustConfirm}
+      backdrop={dismissible ? true : "static"}
+      keyboard={dismissible}
     >
       <Modal.Body className="booking-lanka-auth-modal__body">
         <div
@@ -53,9 +62,26 @@ export default function AuthFeedbackModal({
         <h3 className="booking-lanka-auth-modal__title">{resolvedTitle}</h3>
         {message ? <p className="booking-lanka-auth-modal__message">{message}</p> : null}
         {detail ? <p className="booking-lanka-auth-modal__detail">{detail}</p> : null}
-        <button type="button" className="gotur-btn w-100" onClick={handlePrimary}>
-          {confirmLabel}
-        </button>
+        <div
+          className={
+            cancelLabel
+              ? "booking-lanka-auth-modal__actions booking-lanka-auth-modal__actions--split"
+              : "booking-lanka-auth-modal__actions"
+          }
+        >
+          {cancelLabel ? (
+            <button
+              type="button"
+              className="gotur-btn booking-lanka-auth-modal__btn-secondary w-100"
+              onClick={handleCancel}
+            >
+              {cancelLabel}
+            </button>
+          ) : null}
+          <button type="button" className="gotur-btn w-100" onClick={handlePrimary}>
+            {confirmLabel}
+          </button>
+        </div>
       </Modal.Body>
     </Modal>
   );

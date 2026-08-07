@@ -1,10 +1,16 @@
 import { useEffect, useState } from "react";
 import api from "../../services/apiClient";
+import {
+  feedbackError,
+  feedbackSuccess,
+  useFeedback,
+} from "../../context/FeedbackContext";
 
 /**
  * @param {{ statusFilter: "ACTIVE" | "DRAFT" }} props
  */
 export default function AdminHotels({ statusFilter }) {
+  const { showFeedback } = useFeedback();
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -19,7 +25,7 @@ export default function AdminHotels({ statusFilter }) {
       setHotels(res.data || []);
     } catch (err) {
       console.error("Fetch hotels error:", err);
-      alert("Failed to load hotels");
+      feedbackError(showFeedback, "Failed to load hotels");
     } finally {
       setLoading(false);
     }
@@ -29,11 +35,14 @@ export default function AdminHotels({ statusFilter }) {
     try {
       const newStatus = currentStatus === "ACTIVE" ? "deactivate" : "activate";
       await api.patch(`/admin/hotels/${hotelId}/${newStatus}`);
-      alert(`Hotel is now ${currentStatus === "ACTIVE" ? "DRAFT (deactivated)" : "ACTIVE"}`);
+      feedbackSuccess(
+        showFeedback,
+        `Hotel is now ${currentStatus === "ACTIVE" ? "DRAFT (deactivated)" : "ACTIVE"}`
+      );
       fetchHotels();
     } catch (err) {
       console.error("Error toggling hotel status:", err);
-      alert("Failed to update status");
+      feedbackError(showFeedback, "Failed to update status");
     }
   }
 

@@ -4,33 +4,33 @@ import { Form } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { signup } from "../../../../services/auth";
 import PasswordVisibilityToggle from "../../../common/PasswordVisibilityToggle";
+import { feedbackError, feedbackWarning, useFeedback } from "../../../../context/FeedbackContext";
 
 const SIGNUP_HERO = "/images/login/user-sri-lanka.jpg";
 
 export default function SignupSection() {
+  const { showFeedback } = useFeedback();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState("");
   const [resendLoading, setResendLoading] = useState(false);
   const [resendMessage, setResendMessage] = useState("");
-  const [error, setError] = useState("");
 
   const { register, handleSubmit } = useForm();
 
   const onSubmit = async (data) => {
     if (data.password !== data.confirmPassword) {
-      setError("Password and confirm password must match.");
+      feedbackWarning(showFeedback, "Password and confirm password must match.");
       return;
     }
     setLoading(true);
-    setError("");
     setResendMessage("");
     try {
       const res = await signup(data.email, data.password);
       setRegisteredEmail(res.user?.email || data.email);
     } catch (err) {
-      setError(err.message || "Signup failed");
+      feedbackError(showFeedback, err.message || "Signup failed");
     } finally {
       setLoading(false);
     }
@@ -200,8 +200,6 @@ export default function SignupSection() {
 
                   </div>
                 </Form>
-
-                {!!error && <p style={{ color: "red", marginTop: 10 }}>{error}</p>}
 
                 <p className="login-page__form__text">
                   Already registered?{" "}

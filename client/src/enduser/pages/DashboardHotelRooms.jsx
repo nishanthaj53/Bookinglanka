@@ -2,8 +2,15 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import apiClient, { BASE_URL } from "../../services/apiClient";
 import { setImagePlaceholderOnError } from "../../utils/imagePlaceholder";
+import {
+  apiErrorMessage,
+  feedbackError,
+  feedbackSuccess,
+  useFeedback,
+} from "../../context/FeedbackContext";
 
 export default function DashboardHotelRooms() {
+  const { showFeedback } = useFeedback();
   const { id } = useParams();
   const [hotel, setHotel] = useState(null);
   const [checkIn, setCheckIn] = useState("");
@@ -43,10 +50,12 @@ export default function DashboardHotelRooms() {
         guests: 2,
         rooms,
       });
-      alert("Booking created successfully (Draft)!");
-      navigate("/dashboard/bookings");
+      feedbackSuccess(showFeedback, "Booking created successfully (Draft)!", {
+        title: "Booking created",
+        onConfirm: () => navigate("/dashboard/bookings"),
+      });
     } catch (err) {
-      alert("Error: " + (err.response?.data?.error || err.message));
+      feedbackError(showFeedback, apiErrorMessage(err, "Booking failed"));
     }
   };
 

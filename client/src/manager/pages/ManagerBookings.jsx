@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import apiClient from "../../services/apiClient";
+import {
+  apiErrorMessage,
+  askConfirm,
+  feedbackError,
+  feedbackSuccess,
+  feedbackWarning,
+  useFeedback,
+} from "../../context/FeedbackContext";
 
 function formatYyyyMm(date) {
   const y = date.getFullYear();
@@ -38,6 +46,7 @@ const STATUS_LABEL = {
 };
 
 export default function ManagerBookings() {
+  const { showFeedback } = useFeedback();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -133,7 +142,7 @@ export default function ManagerBookings() {
       await Promise.all([fetchBookings(), fetchCalendar(selectedMonth)]);
     } catch (e) {
       console.error(e);
-      alert(e.response?.data?.error || "Failed to update booking decision");
+      feedbackError(showFeedback, apiErrorMessage(e, "Failed to update booking decision"));
     } finally {
       setBusyById((prev) => ({ ...prev, [bookingId]: false }));
     }
@@ -143,10 +152,10 @@ export default function ManagerBookings() {
     try {
       setBusyById((prev) => ({ ...prev, [bookingId]: true }));
       const res = await apiClient.post(`/manager/bookings/${bookingId}/remind-payment`);
-      alert(res.data?.message || "Reminder sent to user.");
+      feedbackSuccess(showFeedback, res.data?.message || "Reminder sent to user.");
     } catch (e) {
       console.error(e);
-      alert(e.response?.data?.error || e.message || "Failed to send reminder");
+      feedbackError(showFeedback, apiErrorMessage(e, "Failed to send reminder"));
     } finally {
       setBusyById((prev) => ({ ...prev, [bookingId]: false }));
     }
@@ -164,7 +173,7 @@ export default function ManagerBookings() {
       await Promise.all([fetchBookings(), fetchCalendar(selectedMonth)]);
     } catch (e) {
       console.error(e);
-      alert(e.response?.data?.error || "Failed to update booking status");
+      feedbackError(showFeedback, apiErrorMessage(e, "Failed to update booking status"));
     } finally {
       setBusyById((prev) => ({ ...prev, [bookingId]: false }));
     }
@@ -214,7 +223,7 @@ export default function ManagerBookings() {
   const createPauseWindow = async (e) => {
     e.preventDefault();
     if (!pauseRoomId || !pauseStartDate || !pauseEndDate) {
-      alert("Select room, start date and end date.");
+      feedbackWarning(showFeedback, "Select room, start date and end date.");
       return;
     }
     try {
@@ -226,7 +235,8 @@ export default function ManagerBookings() {
       });
       const cancelledCount = Number(res.data?.cancelledCount || 0);
       if (cancelledCount > 0) {
-        alert(
+        feedbackSuccess(
+          showFeedback,
           `Pause created. ${cancelledCount} booking request(s) were cancelled due to no space.`
         );
       }
@@ -237,10 +247,14 @@ export default function ManagerBookings() {
     } catch (e2) {
       console.error(e2);
       const conflict = e2.response?.data?.conflict;
-      const conflictText = conflict
-        ? `\nBooked period: ${formatDate(conflict.checkIn)} -> ${formatDate(conflict.checkOut)}`
-        : "";
-      alert((e2.response?.data?.error || "Failed to create pause window") + conflictText);
+      const conflictDetail = conflict
+        ? `Booked period: ${formatDate(conflict.checkIn)} -> ${formatDate(conflict.checkOut)}`
+        : undefined;
+      feedbackError(
+        showFeedback,
+        e2.response?.data?.error || "Failed to create pause window",
+        conflictDetail ? { detail: conflictDetail } : undefined
+      );
     } finally {
       setPauseBusy(false);
     }
@@ -248,14 +262,20 @@ export default function ManagerBookings() {
 
   const removePauseWindow = async (blockId) => {
     if (!pauseRoomId || !blockId) return;
-    if (!window.confirm("Remove this pause window?")) return;
+    const ok = await askConfirm(showFeedback, {
+      title: "Remove pause window",
+      message: "Remove this pause window?",
+      confirmLabel: "Remove",
+      cancelLabel: "Cancel",
+    });
+    if (!ok) return;
     try {
       setPauseBusy(true);
       await apiClient.delete(`/manager/rooms/item/${pauseRoomId}/blocks/${blockId}`);
       await Promise.all([loadPauseBlocks(pauseRoomId), fetchCalendar(selectedMonth)]);
     } catch (e) {
       console.error(e);
-      alert(e.response?.data?.error || "Failed to remove pause window");
+      feedbackError(showFeedback, apiErrorMessage(e, "Failed to remove pause window"));
     } finally {
       setPauseBusy(false);
     }

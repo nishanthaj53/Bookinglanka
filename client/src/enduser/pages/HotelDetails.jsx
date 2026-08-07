@@ -10,6 +10,13 @@ import HeaderTwoCloned from "../../components/gotur/layout/HeaderTwoCloned/Heade
 import FooterOne from "../../components/gotur/layout/FooterOne/FooterOne";
 import MovingImageStrip, { resolveImageUrl, movingStripCss } from "../../components/gotur/tour/MovingImageStrip";
 import "../../styles/room-booking-details.css";
+import {
+  apiErrorMessage,
+  feedbackError,
+  feedbackSuccess,
+  feedbackWarning,
+  useFeedback,
+} from "../../context/FeedbackContext";
 
 const STATIC_REVIEWS = [
   {
@@ -36,6 +43,7 @@ function formatPrice(value) {
 }
 
 export default function HotelDetails() {
+  const { showFeedback } = useFeedback();
   const { id } = useParams();
   const navigate = useNavigate();
   const [hotel, setHotel] = useState(null);
@@ -122,11 +130,11 @@ export default function HotelDetails() {
     e.preventDefault();
 
     if (!selectedRoom?.id) {
-      alert("Please select a room type first.");
+      feedbackWarning(showFeedback, "Please select a room type first.");
       return;
     }
     if (!checkIn || !checkOut) {
-      alert("Please select check-in and check-out dates.");
+      feedbackWarning(showFeedback, "Please select check-in and check-out dates.");
       return;
     }
     if (!token) {
@@ -145,17 +153,20 @@ export default function HotelDetails() {
         rooms: roomsCount,
         bookingFlow,
       });
-      alert(bookingFlow === "INSTANT" ? "Booking confirmed." : "Booking request created.");
-      navigate("/dashboard/bookings");
+      feedbackSuccess(
+        showFeedback,
+        bookingFlow === "INSTANT" ? "Booking confirmed." : "Booking request created.",
+        { title: "Success", onConfirm: () => navigate("/dashboard/bookings") }
+      );
     } catch (err) {
-      alert("Booking failed: " + (err.response?.data?.error || err.message));
+      feedbackError(showFeedback, apiErrorMessage(err, "Booking failed"));
     }
   };
 
   const handleReviewSubmit = (e) => {
     e.preventDefault();
     if (!reviewForm.name || !reviewForm.message) {
-      alert("Please enter name and review message.");
+      feedbackWarning(showFeedback, "Please enter name and review message.");
       return;
     }
     setCustomReviews((prev) => [

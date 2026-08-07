@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import apiClient, { BASE_URL } from "../../services/apiClient";
 import { setImagePlaceholderOnError } from "../../utils/imagePlaceholder";
+import { apiErrorMessage, feedbackError, useFeedback } from "../../context/FeedbackContext";
 
 const STATUS_COLORS = {
   DRAFT: "#6c757d",
@@ -22,6 +23,7 @@ const STATUS_LABELS = {
 };
 
 export default function DashboardBookings() {
+  const { showFeedback } = useFeedback();
   const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -108,7 +110,7 @@ export default function DashboardBookings() {
       setEditingId(null);
       await refreshBookings();
     } catch (e) {
-      alert(e.response?.data?.error || "Failed to update booking");
+      feedbackError(showFeedback, apiErrorMessage(e, "Failed to update booking"));
     } finally {
       setEditBusy(false);
     }

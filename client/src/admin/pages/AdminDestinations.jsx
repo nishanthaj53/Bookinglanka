@@ -1,5 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../../services/apiClient";
+import {
+  apiErrorMessage,
+  askConfirm,
+  feedbackError,
+  feedbackSuccess,
+  useFeedback,
+} from "../../context/FeedbackContext";
 
 const INITIAL_FORM = {
   name: "",
@@ -33,6 +40,7 @@ function buildMapEmbedFromParts({ name, town, district, region }) {
 }
 
 export default function AdminDestinations() {
+  const { showFeedback } = useFeedback();
   const [destinations, setDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -58,7 +66,7 @@ export default function AdminDestinations() {
       setDestinations(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Fetch destinations failed:", err);
-      alert("Failed to load destinations");
+      feedbackError(showFeedback, "Failed to load destinations");
     } finally {
       setLoading(false);
     }
@@ -107,14 +115,20 @@ export default function AdminDestinations() {
   };
 
   const onDelete = async (id) => {
-    if (!window.confirm("Delete this destination?")) return;
+    const ok = await askConfirm(showFeedback, {
+      title: "Delete destination",
+      message: "Delete this destination?",
+      confirmLabel: "Delete",
+      cancelLabel: "Cancel",
+    });
+    if (!ok) return;
     try {
       await api.delete(`/admin/destinations/${id}`);
       await fetchDestinations();
       if (editingId === id) resetForm();
     } catch (err) {
       console.error("Delete destination failed:", err);
-      alert(err.response?.data?.error || "Failed to delete destination");
+      feedbackError(showFeedback, apiErrorMessage(err, "Failed to delete destination"));
     }
   };
 
@@ -145,19 +159,19 @@ export default function AdminDestinations() {
         await api.put(`/admin/destinations/${editingId}`, body, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        alert("Destination updated");
+        feedbackSuccess(showFeedback, "Destination updated");
       } else {
         await api.post("/admin/destinations", body, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        alert("Destination created");
+        feedbackSuccess(showFeedback, "Destination created");
       }
 
       await fetchDestinations();
       resetForm();
     } catch (err) {
       console.error("Save destination failed:", err);
-      alert(err.response?.data?.error || "Failed to save destination");
+      feedbackError(showFeedback, apiErrorMessage(err, "Failed to save destination"));
     } finally {
       setSaving(false);
     }

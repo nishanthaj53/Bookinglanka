@@ -1,14 +1,18 @@
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom";
+import { feedbackSuccess, useFeedback } from "../../context/FeedbackContext";
 
 export default function Navbar() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const { showFeedback } = useFeedback();
 
   const handleLogout = () => {
-    localStorage.removeItem("accessToken")
-    localStorage.removeItem("refreshToken")
-    alert("You have logged out.")
-    navigate("/login")
-  }
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    feedbackSuccess(showFeedback, "You have logged out.", {
+      title: "Signed out",
+      onConfirm: () => navigate("/login"),
+    });
+  };
 
   return (
     <nav
@@ -29,5 +33,5 @@ export default function Navbar() {
       </div>
       <button onClick={handleLogout}>Logout</button>
     </nav>
-  )
+  );
 }

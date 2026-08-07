@@ -4,6 +4,12 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import apiClient from "../../services/apiClient";
 import { MANAGER_ROUTES } from "../../components/manager/managerNav";
 import { HOTEL_TYPE_OPTIONS } from "../../enduser/constants/userDashboardHotelOptions";
+import {
+  feedbackError,
+  feedbackSuccess,
+  feedbackWarning,
+  useFeedback,
+} from "../../context/FeedbackContext";
 
 function addTileStyle(height) {
   return {
@@ -25,6 +31,7 @@ function addTileStyle(height) {
 }
 
 export default function ManagerHotelCreate() {
+  const { showFeedback } = useFeedback();
   const navigate = useNavigate();
   const { refreshDashboard } = useOutletContext();
   const coverInputRef = useRef(null);
@@ -193,19 +200,19 @@ export default function ManagerHotelCreate() {
   const handleAddHotel = async (e) => {
     e.preventDefault();
     if (!form.name?.trim()) {
-      alert("Hotel name is required.");
+      feedbackWarning(showFeedback, "Hotel name is required.");
       return;
     }
     if (!form.address?.trim()) {
-      alert("Address is required.");
+      feedbackWarning(showFeedback, "Address is required.");
       return;
     }
     if (!cover?.file) {
-      alert("Please add a cover image for the hotel.");
+      feedbackWarning(showFeedback, "Please add a cover image for the hotel.");
       return;
     }
     if (gallery.length < 1) {
-      alert("Please add at least one relevant hotel photo (in addition to the cover).");
+      feedbackWarning(showFeedback, "Please add at least one relevant hotel photo (in addition to the cover).");
       return;
     }
 
@@ -215,11 +222,11 @@ export default function ManagerHotelCreate() {
       const cap = Number(r.capacity);
       const price = Number(r.pricePerNight);
       if (!nameOk || !r.capacity || Number.isNaN(cap) || cap < 1) {
-        alert('Each room you add needs a name and a valid capacity (guest count).');
+        feedbackWarning(showFeedback, "Each room you add needs a name and a valid capacity (guest count).");
         return;
       }
       if (!r.pricePerNight || Number.isNaN(price) || price <= 0) {
-        alert('Each room you add needs a price per night greater than 0.');
+        feedbackWarning(showFeedback, "Each room you add needs a price per night greater than 0.");
         return;
       }
     }
@@ -259,14 +266,18 @@ export default function ManagerHotelCreate() {
         }
       }
 
-      alert("Hotel created successfully.");
-      if (refreshDashboard) await refreshDashboard();
-      navigate(hotelId ? `/manager/dashboard/hotels/${hotelId}` : MANAGER_ROUTES.hotelsActive);
+      feedbackSuccess(showFeedback, "Hotel created successfully.", {
+        title: "Success",
+        onConfirm: async () => {
+          if (refreshDashboard) await refreshDashboard();
+          navigate(hotelId ? `/manager/dashboard/hotels/${hotelId}` : MANAGER_ROUTES.hotelsActive);
+        },
+      });
     } catch (err) {
       console.error("Add hotel error:", err);
       const msg = err.response?.data?.error || "Error creating hotel";
       const details = err.response?.data?.details;
-      alert(details ? `${msg}\n\n${details}` : msg);
+      feedbackError(showFeedback, msg, details ? { detail: details } : undefined);
     } finally {
       setLoading(false);
     }

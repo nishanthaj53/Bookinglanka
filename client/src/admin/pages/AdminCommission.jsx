@@ -1,8 +1,15 @@
 import { useEffect, useState } from "react";
 import apiClient from "../../services/apiClient";
 import "../../components/dashboard/dashboard-pages.css";
+import {
+  apiErrorMessage,
+  feedbackError,
+  feedbackSuccess,
+  useFeedback,
+} from "../../context/FeedbackContext";
 
 export default function AdminCommission() {
+  const { showFeedback } = useFeedback();
   const [loading, setLoading] = useState(true);
   const [savingGlobal, setSavingGlobal] = useState(false);
   const [globalPercent, setGlobalPercent] = useState(15);
@@ -21,7 +28,7 @@ export default function AdminCommission() {
       }
       setDrafts(next);
     } catch (err) {
-      alert(err.response?.data?.error || "Failed to load commission settings");
+      feedbackError(showFeedback, apiErrorMessage(err, "Failed to load commission settings"));
     } finally {
       setLoading(false);
     }
@@ -38,10 +45,10 @@ export default function AdminCommission() {
       await apiClient.put("/admin/commission/global", {
         ratePercent: Number(globalPercent),
       });
-      alert("Global commission saved (default for hotels without override).");
+      feedbackSuccess(showFeedback, "Global commission saved (default for hotels without override).");
       await load();
     } catch (err) {
-      alert(err.response?.data?.error || "Failed to save global commission");
+      feedbackError(showFeedback, apiErrorMessage(err, "Failed to save global commission"));
     } finally {
       setSavingGlobal(false);
     }
@@ -54,7 +61,7 @@ export default function AdminCommission() {
       });
       await load();
     } catch (err) {
-      alert(err.response?.data?.error || "Failed to save hotel commission");
+      feedbackError(showFeedback, apiErrorMessage(err, "Failed to save hotel commission"));
     }
   };
 
@@ -63,7 +70,7 @@ export default function AdminCommission() {
       await apiClient.delete(`/admin/commission/hotels/${hotelId}`);
       await load();
     } catch (err) {
-      alert(err.response?.data?.error || "Failed to clear override");
+      feedbackError(showFeedback, apiErrorMessage(err, "Failed to clear override"));
     }
   };
 

@@ -10,6 +10,7 @@ import { contactFormFields } from "@/data/contactData";
 import FullWidthCalendar from "../Calender/Calender";
 import Slider from "react-slick";
 import Link from "next/link";
+import { feedbackWarning, useFeedback } from "../../../../context/FeedbackContext";
 interface ContactFormField {
   name: string;
   label: string;
@@ -63,6 +64,7 @@ interface Comment {
   avatar: StaticImageData;
 }
 const TourListingTwoDetails: React.FC = () => {
+  const { showFeedback } = useFeedback();
   const [startDate, setStartDate] = useState<Date | null>();
   const [startTime, setStartTime] = useState<Date | null>();
   const [isOpen, setOpen] = useState(false);
@@ -162,7 +164,7 @@ const TourListingTwoDetails: React.FC = () => {
     e.preventDefault();
 
     if (!startDate || !startTime) {
-      alert("Please select both date and time.");
+      feedbackWarning(showFeedback, "Please select both date and time.");
       return;
     }
 

@@ -3,14 +3,14 @@ import { Link } from 'react-router-dom'
 import { Form } from 'react-bootstrap'
 import LoginPageLayout from '../../components/dashboard/LoginPageLayout'
 import { forgotPassword } from '../../services/auth'
+import { feedbackError, feedbackSuccess, useFeedback } from '../../context/FeedbackContext'
 
 const HERO = '/images/login/user-sri-lanka.jpg'
 
 export default function ForgotPasswordPage() {
+  const { showFeedback } = useFeedback()
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState('')
-  const [error, setError] = useState('')
 
   useEffect(() => {
     document.title = 'Forgot Password || Booking Lanka'
@@ -18,15 +18,15 @@ export default function ForgotPasswordPage() {
 
   const onSubmit = async (e) => {
     e.preventDefault()
-    setError('')
-    setMessage('')
     setLoading(true)
     try {
       const data = await forgotPassword(email.trim())
-      setMessage(data.message || 'If this email is registered, a reset link has been sent.')
       setEmail('')
+      feedbackSuccess(showFeedback, data.message || 'If this email is registered, a reset link has been sent.', {
+        title: 'Check your email',
+      })
     } catch (err) {
-      setError(err.message || 'Something went wrong')
+      feedbackError(showFeedback, err.message || 'Something went wrong')
     } finally {
       setLoading(false)
     }
@@ -68,11 +68,6 @@ export default function ForgotPasswordPage() {
               </div>
             </div>
           </Form>
-
-          {!!message && (
-            <p style={{ color: '#15803d', marginTop: 12, lineHeight: 1.6 }}>{message}</p>
-          )}
-          {!!error && <p style={{ color: 'red', marginTop: 12 }}>{error}</p>}
 
           <div className="login-page__divider" />
           <p className="login-page__form__text text-center">

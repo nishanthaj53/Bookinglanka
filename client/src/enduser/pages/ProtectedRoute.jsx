@@ -1,38 +1,59 @@
-// client/src/pages/ProtectedUserRoute.jsx
-import { Navigate } from "react-router-dom"
-import { isTokenExpired, isUserToken, isManagerToken } from "../../utils/tokenUtils"
+import FeedbackRedirect from "../../components/common/FeedbackRedirect";
+import { isTokenExpired, isUserToken, isManagerToken } from "../../utils/tokenUtils";
 
 export default function ProtectedUserRoute({ children }) {
-  const token = localStorage.getItem("accessToken") || localStorage.getItem("managerAccessToken")
+  const token = localStorage.getItem("accessToken") || localStorage.getItem("managerAccessToken");
 
-  // No token
   if (!token) {
-    alert("Please login to continue.")
-    return <Navigate to="/login" replace />
+    return (
+      <FeedbackRedirect
+        to="/login"
+        variant="warning"
+        title="Sign in required"
+        message="Please login to continue."
+      />
+    );
   }
 
-  // Expired token
   if (isTokenExpired(token)) {
-    alert("Your session has expired. Please login again.")
-    localStorage.removeItem("accessToken")
-    localStorage.removeItem("managerAccessToken")
-    return <Navigate to="/login" replace />
+    return (
+      <FeedbackRedirect
+        to="/login"
+        variant="warning"
+        title="Session expired"
+        message="Your session has expired. Please login again."
+        onBeforeNavigate={() => {
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("managerAccessToken");
+        }}
+      />
+    );
   }
 
-  // ❌ Manager trying to access user portal
   if (isManagerToken(token)) {
-    alert("Access denied — manager accounts are not authorized here.")
-    localStorage.removeItem("managerAccessToken")
-    return <Navigate to="/manager/login" replace />
+    return (
+      <FeedbackRedirect
+        to="/manager/login"
+        variant="warning"
+        title="Wrong portal"
+        message="Manager accounts are not authorized on the traveller dashboard."
+        detail="We will open the manager sign-in page for your account."
+        onBeforeNavigate={() => localStorage.removeItem("managerAccessToken")}
+      />
+    );
   }
 
-  // ✅ Valid user token
   if (isUserToken(token)) {
-    return children
+    return children;
   }
 
-  // Fallback
-  alert("Unauthorized access. Please login again.")
-  localStorage.removeItem("accessToken")
-  return <Navigate to="/login" replace />
+  return (
+    <FeedbackRedirect
+      to="/login"
+      variant="error"
+      title="Unauthorized"
+      message="Unauthorized access. Please login again."
+      onBeforeNavigate={() => localStorage.removeItem("accessToken")}
+    />
+  );
 }

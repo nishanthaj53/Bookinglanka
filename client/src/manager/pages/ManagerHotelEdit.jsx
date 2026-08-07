@@ -4,6 +4,13 @@ import { Col, Row } from "react-bootstrap";
 import apiClient from "../../services/apiClient";
 import "../../components/dashboard/dashboard-pages.css";
 import { HOTEL_TYPE_OPTIONS } from "../../enduser/constants/userDashboardHotelOptions";
+import {
+  apiErrorMessage,
+  feedbackError,
+  feedbackSuccess,
+  feedbackWarning,
+  useFeedback,
+} from "../../context/FeedbackContext";
 
 const MAIN_PHOTO_ROLE_OPTIONS = ["Cover", "Lobby", "Pool", "Exterior", "Common", "Other"];
 
@@ -13,6 +20,7 @@ function arrToCsv(arr) {
 }
 
 export default function ManagerHotelEdit() {
+  const { showFeedback } = useFeedback();
   const { hotelId } = useParams();
   const navigate = useNavigate();
   const { refreshDashboard } = useOutletContext() || {};
@@ -117,7 +125,7 @@ export default function ManagerHotelEdit() {
 
   const handleSaveMainPhotos = async () => {
     if (photoImages.length === 0) {
-      alert("Select at least one image first.");
+      feedbackWarning(showFeedback, "Select at least one image first.");
       return;
     }
     try {
@@ -131,10 +139,10 @@ export default function ManagerHotelEdit() {
       setPhotoImages([]);
       setPhotoPreviews([]);
       setPhotoRoles([]);
-      alert("Cover and main photos saved.");
+      feedbackSuccess(showFeedback, "Cover and main photos saved.");
       if (refreshDashboard) await refreshDashboard();
     } catch (err) {
-      alert(err.response?.data?.error || "Failed to save photos");
+      feedbackError(showFeedback, apiErrorMessage(err, "Failed to save photos"));
     } finally {
       setPhotoSaving(false);
     }
@@ -143,7 +151,7 @@ export default function ManagerHotelEdit() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name?.trim() || !form.address?.trim()) {
-      alert("Hotel name and address are required.");
+      feedbackWarning(showFeedback, "Hotel name and address are required.");
       return;
     }
     try {
@@ -166,11 +174,15 @@ export default function ManagerHotelEdit() {
         amenities: form.amenities,
         roomAmenities: form.roomAmenities,
       });
-      alert("Hotel details saved.");
-      if (refreshDashboard) await refreshDashboard();
-      navigate(`/manager/dashboard/hotels/${hotelId}`);
+      feedbackSuccess(showFeedback, "Hotel details saved.", {
+        title: "Saved",
+        onConfirm: async () => {
+          if (refreshDashboard) await refreshDashboard();
+          navigate(`/manager/dashboard/hotels/${hotelId}`);
+        },
+      });
     } catch (err) {
-      alert(err.response?.data?.error || "Save failed");
+      feedbackError(showFeedback, apiErrorMessage(err, "Save failed"));
     } finally {
       setSaving(false);
     }

@@ -1,8 +1,16 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { signup } from "../../services/auth"
+import {
+  apiErrorMessage,
+  feedbackError,
+  feedbackSuccess,
+  feedbackWarning,
+  useFeedback,
+} from "../../context/FeedbackContext"
 
 export default function Signup() {
+  const { showFeedback } = useFeedback()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -14,7 +22,7 @@ export default function Signup() {
   const handleSignup = async (e) => {
     e.preventDefault()
     if (password !== confirmPassword) {
-      alert("Password and confirm password must match.")
+      feedbackWarning(showFeedback, "Password and confirm password must match.")
       return
     }
     setLoading(true)
@@ -23,10 +31,12 @@ export default function Signup() {
       const res = await signup(email, password)
       localStorage.setItem("accessToken", res.tokens.accessToken)
       localStorage.setItem("refreshToken", res.tokens.refreshToken)
-      alert("Signup successful!")
-      navigate("/dashboard")
+      feedbackSuccess(showFeedback, "Signup successful!", {
+        title: "Welcome",
+        onConfirm: () => navigate("/dashboard"),
+      })
     } catch (err) {
-      alert("Signup failed: " + err.message)
+      feedbackError(showFeedback, apiErrorMessage(err, "Signup failed"))
     } finally {
       setLoading(false)
     }

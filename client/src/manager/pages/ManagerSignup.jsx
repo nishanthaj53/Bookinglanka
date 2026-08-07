@@ -3,8 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { Form } from "react-bootstrap";
 import LoginPageLayout from "../../components/dashboard/LoginPageLayout";
 import PasswordVisibilityToggle from "../../components/common/PasswordVisibilityToggle";
+import { feedbackError, feedbackWarning, useFeedback } from "../../context/FeedbackContext";
 
 export default function ManagerSignup() {
+  const { showFeedback } = useFeedback();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -14,17 +16,15 @@ export default function ManagerSignup() {
   const [registeredEmail, setRegisteredEmail] = useState("");
   const [resendLoading, setResendLoading] = useState(false);
   const [resendMessage, setResendMessage] = useState("");
-  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      setError("Password and confirm password must match.");
+      feedbackWarning(showFeedback, "Password and confirm password must match.");
       return;
     }
     setLoading(true);
-    setError("");
     setResendMessage("");
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/manager/auth/signup`, {
@@ -42,7 +42,7 @@ export default function ManagerSignup() {
 
       navigate("/manager/login");
     } catch (err) {
-      setError(err.message);
+      feedbackError(showFeedback, err.message);
     } finally {
       setLoading(false);
     }
@@ -170,7 +170,6 @@ export default function ManagerSignup() {
             </div>
           </div>
         </Form>
-        {!!error && <p style={{ color: "red", marginTop: 10 }}>{error}</p>}
         <div className="login-page__divider" />
         <p className="login-page__form__text text-center">
           Already have an account?{" "}

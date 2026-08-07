@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import apiClient from "../../services/apiClient";
+import { apiErrorMessage, feedbackError, useFeedback } from "../../context/FeedbackContext";
 
 function readCartFromLocation(location) {
   if (Array.isArray(location.state?.items) && location.state.items.length) {
@@ -16,6 +17,7 @@ function readCartFromLocation(location) {
 }
 
 export default function DashboardBookingsCart() {
+  const { showFeedback } = useFeedback();
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -106,7 +108,7 @@ export default function DashboardBookingsCart() {
       setMessage("");
       await startCheckout(items.map((i) => i.id));
     } catch (e) {
-      alert(e.response?.data?.error || e.message || "Payment failed");
+      feedbackError(showFeedback, apiErrorMessage(e, "Payment failed"));
       try {
         await syncCartWithServer();
       } catch {

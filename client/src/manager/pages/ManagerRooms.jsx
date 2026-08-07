@@ -6,6 +6,14 @@ import { setImagePlaceholderOnError } from "../../utils/imagePlaceholder";
 import "../../components/dashboard/dashboard-pages.css";
 import "../../styles/room-booking-details.css";
 import RoomGalleryCarousel from "../../components/gotur/RoomGalleryCarousel";
+import {
+  apiErrorMessage,
+  askConfirm,
+  feedbackError,
+  feedbackSuccess,
+  feedbackWarning,
+  useFeedback,
+} from "../../context/FeedbackContext";
 
 function imgSrc(url) {
   if (!url) return "";
@@ -21,6 +29,7 @@ function revokeIfBlob(url) {
 }
 
 export default function ManagerRooms() {
+  const { showFeedback } = useFeedback();
   const { hotelId } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -55,7 +64,7 @@ export default function ManagerRooms() {
       setRooms(res.data || []);
     } catch (err) {
       console.error(err);
-      alert("Failed to load rooms");
+      feedbackError(showFeedback, apiErrorMessage(err, "Failed to load rooms"));
     } finally {
       setLoadingList(false);
     }
@@ -129,7 +138,7 @@ export default function ManagerRooms() {
     if (r.canEdit === false) {
       editLoadedRef.current = "";
       navigate(hotelHubPath, { replace: true });
-      alert("This room has an active guest booking. You can edit again after checkout.");
+      feedbackWarning(showFeedback, "This room has an active guest booking. You can edit again after checkout.");
       return;
     }
     loadRoomForEdit(r);
@@ -211,11 +220,11 @@ export default function ManagerRooms() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name.trim() || !totalUnits || !capacity || !pricePerNight) {
-      alert("Room name, total units, capacity, and room price are required.");
+      feedbackWarning(showFeedback, "Room name, total units, capacity, and room price are required.");
       return;
     }
     if (!editingId && galleryFiles.length < 1) {
-      alert("Add at least one room photo. Guests will use the arrows to browse all photos.");
+      feedbackWarning(showFeedback, "Add at least one room photo. Guests will use the arrows to browse all photos.");
       return;
     }
 
@@ -223,7 +232,7 @@ export default function ManagerRooms() {
     if (rowsWithFiles.length > 0) {
       const missing = rowsWithFiles.some((r) => !r.label.trim());
       if (missing) {
-        alert("Each amenity photo needs a label.");
+        feedbackWarning(showFeedback, "Each amenity photo needs a label.");
         return;
       }
     }
@@ -252,7 +261,7 @@ export default function ManagerRooms() {
             highlights: "",
           });
         }
-        alert("Room saved.");
+        feedbackSuccess(showFeedback, "Room saved.");
         navigate(`/manager/dashboard/hotels/${hotelId}/rooms/${editingId}`, { replace: true });
       } else {
         const fd = buildFormData();
@@ -263,7 +272,7 @@ export default function ManagerRooms() {
         if (newId) {
           navigate(`/manager/dashboard/hotels/${hotelId}/rooms/${newId}`, { replace: true });
         } else {
-          alert("Room created.");
+          feedbackSuccess(showFeedback, "Room created.");
         }
       }
       resetForm();
@@ -271,15 +280,20 @@ export default function ManagerRooms() {
       await fetchRooms();
     } catch (err) {
       console.error(err);
-      const msg = err.response?.data?.error || "Save failed";
-      alert(msg);
+      feedbackError(showFeedback, apiErrorMessage(err, "Save failed"));
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (roomId) => {
-    if (!window.confirm("Delete this room?")) return;
+    const ok = await askConfirm(showFeedback, {
+      title: "Delete room",
+      message: "Delete this room?",
+      confirmLabel: "Delete",
+      cancelLabel: "Cancel",
+    });
+    if (!ok) return;
     try {
       await apiClient.delete(`/manager/rooms/item/${roomId}`);
       if (editingId === roomId) {
@@ -289,7 +303,7 @@ export default function ManagerRooms() {
       }
       await fetchRooms();
     } catch (err) {
-      alert(err.response?.data?.error || "Delete failed");
+      feedbackError(showFeedback, apiErrorMessage(err, "Delete failed"));
     }
   };
 
@@ -299,7 +313,7 @@ export default function ManagerRooms() {
 
   const goEditRoom = (r) => {
     if (r.canEdit === false) {
-      alert("This room has an active guest booking. You can edit again after checkout.");
+      feedbackWarning(showFeedback, "This room has an active guest booking. You can edit again after checkout.");
       return;
     }
     setShowCreateForm(true);

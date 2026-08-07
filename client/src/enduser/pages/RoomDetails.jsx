@@ -8,8 +8,16 @@ import HeaderTwo from "../../components/gotur/layout/HeaderTwo/HeaderTwo";
 import HeaderTwoCloned from "../../components/gotur/layout/HeaderTwoCloned/HeaderTwoCloned";
 import FooterOne from "../../components/gotur/layout/FooterOne/FooterOne";
 import RoomDetailViewCore from "../../components/room/RoomDetailViewCore";
+import {
+  apiErrorMessage,
+  feedbackError,
+  feedbackSuccess,
+  feedbackWarning,
+  useFeedback,
+} from "../../context/FeedbackContext";
 
 export default function RoomDetails() {
+  const { showFeedback } = useFeedback();
   const { hotelId, roomId } = useParams();
   const navigate = useNavigate();
   const [hotel, setHotel] = useState(null);
@@ -65,7 +73,7 @@ export default function RoomDetails() {
     e.preventDefault();
     if (!room?.id) return;
     if (!checkIn || !checkOut) {
-      alert("Please select check-in and check-out dates.");
+      feedbackWarning(showFeedback, "Please select check-in and check-out dates.");
       return;
     }
     if (!token) {
@@ -82,10 +90,12 @@ export default function RoomDetails() {
         guests,
         rooms: roomsCount,
       });
-      alert("Room booking created successfully.");
-      navigate("/dashboard/bookings");
+      feedbackSuccess(showFeedback, "Room booking created successfully.", {
+        title: "Booking created",
+        onConfirm: () => navigate("/dashboard/bookings"),
+      });
     } catch (err) {
-      alert("Booking failed: " + (err.response?.data?.error || err.message));
+      feedbackError(showFeedback, apiErrorMessage(err, "Booking failed"));
     }
   };
 

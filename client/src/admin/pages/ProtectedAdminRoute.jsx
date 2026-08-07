@@ -1,25 +1,43 @@
-import { Navigate } from "react-router-dom"
-import { isTokenExpired, isAdminToken } from "../../utils/tokenUtils"
+import FeedbackRedirect from "../../components/common/FeedbackRedirect";
+import { isTokenExpired, isAdminToken } from "../../utils/tokenUtils";
 
 export default function ProtectedAdminRoute({ children }) {
-  const token = localStorage.getItem("adminAccessToken")
+  const token = localStorage.getItem("adminAccessToken");
 
   if (!token) {
-    alert("Admin access only. Please login as admin.")
-    return <Navigate to="/admin/login" replace />
+    return (
+      <FeedbackRedirect
+        to="/admin/login"
+        variant="warning"
+        title="Admin sign-in required"
+        message="Admin access only. Please login as admin."
+      />
+    );
   }
 
   if (isTokenExpired(token)) {
-    alert("Session expired. Please login again.")
-    localStorage.removeItem("adminAccessToken")
-    return <Navigate to="/admin/login" replace />
+    return (
+      <FeedbackRedirect
+        to="/admin/login"
+        variant="warning"
+        title="Session expired"
+        message="Session expired. Please login again."
+        onBeforeNavigate={() => localStorage.removeItem("adminAccessToken")}
+      />
+    );
   }
 
   if (!isAdminToken(token)) {
-    alert("Access denied. Admins only.")
-    localStorage.clear()
-    return <Navigate to="/admin/login" replace />
+    return (
+      <FeedbackRedirect
+        to="/admin/login"
+        variant="error"
+        title="Access denied"
+        message="Access denied. Admins only."
+        onBeforeNavigate={() => localStorage.clear()}
+      />
+    );
   }
 
-  return children
+  return children;
 }
