@@ -18,6 +18,7 @@ export const ADMIN_NAV = [
     ],
   },
   { to: "/admin/dashboard/destinations", label: "Destinations", icon: "icon-location" },
+  { to: "/admin/dashboard/commission", label: "Commission", icon: "icon-chart" },
   { to: "/admin/dashboard/revenue", label: "Revenue", icon: "icon-chart" },
 ];
 

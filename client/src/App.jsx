@@ -50,6 +50,7 @@ import AdminBookings from "./admin/pages/AdminBookings";
 import AdminUsers from "./admin/pages/AdminUsers";
 import AdminRevenue from "./admin/pages/AdminRevenue";
 import AdminDestinations from "./admin/pages/AdminDestinations";
+import AdminCommission from "./admin/pages/AdminCommission";
 
 export default function App() {
   return (
@@ -145,6 +146,7 @@ export default function App() {
           <Route path="members/managers" element={<AdminUsers accountKind="manager" />} />
           <Route path="revenue" element={<AdminRevenue />} />
           <Route path="destinations" element={<AdminDestinations />} />
+          <Route path="commission" element={<AdminCommission />} />
           <Route index element={<Navigate to="/admin/dashboard/hotels/active" replace />} />
         </Route>
 

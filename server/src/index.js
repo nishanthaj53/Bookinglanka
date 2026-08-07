@@ -29,10 +29,14 @@ import adminBookingsRouter from "./routes/admin/bookings.js";
 import adminUsersRouter from "./routes/admin/users.js";
 import adminStatsRouter from "./routes/admin/stats.js";
 import adminDestinationsRouter from "./routes/admin/destinations.js";
+import adminCommissionRouter from "./routes/admin/commission.js";
 import aiRouter from "./routes/ai.js";
+import paymentsRouter from "./routes/payments.js";
+import stripeWebhookRouter from "./routes/webhooks/stripe.js";
 
 // Prisma
 import { prisma } from "./db/client.js";
+import { ensureDefaultCommissionRule } from "./services/commission.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -73,6 +77,9 @@ app.use(
   })
 );
 
+/* Stripe webhook needs raw body — mount before express.json() */
+app.use("/webhooks/stripe", stripeWebhookRouter);
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(rateLimit({ windowMs: 60_000, limit: 120 }));
@@ -106,6 +113,7 @@ app.use("/auth", authRouter);
 app.use("/hotels", hotelsRouter);
 app.use("/destinations", destinationsRouter);
 app.use("/bookings", bookingsRouter);
+app.use("/payments", paymentsRouter);
 app.use("/ai", aiRouter);
 
 app.use("/manager/auth", managerAuthRouter);
@@ -122,6 +130,7 @@ app.use("/admin/bookings", adminBookingsRouter);
 app.use("/admin/users", adminUsersRouter);
 app.use("/admin/stats", adminStatsRouter);
 app.use("/admin/destinations", adminDestinationsRouter);
+app.use("/admin/commission", adminCommissionRouter);
 
 /* ================= ERROR HANDLING (multer / uploads) ================= */
 app.use((err, req, res, next) => {
@@ -149,6 +158,12 @@ app.use((err, req, res, _next) => {
 });
 
 /* ================= START ================= */
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`✅ API listening on http://localhost:${PORT}`);
+  try {
+    await ensureDefaultCommissionRule();
+    console.log("✅ Default commission rule ready (15% unless overridden)");
+  } catch (e) {
+    console.warn("Commission default seed skipped:", e.message);
+  }
 });

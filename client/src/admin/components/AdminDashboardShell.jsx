@@ -13,6 +13,7 @@ const ROUTE_TITLES = [
   { match: "/admin/dashboard/members/users", title: "Users", sub: "Members" },
   { match: "/admin/dashboard/members/managers", title: "Branch managers", sub: "Members" },
   { match: "/admin/dashboard/destinations", title: "Destinations", sub: "Content" },
+  { match: "/admin/dashboard/commission", title: "Commission", sub: "Payments" },
   { match: "/admin/dashboard/revenue", title: "Revenue & stats", sub: "Admin" },
 ];
 
