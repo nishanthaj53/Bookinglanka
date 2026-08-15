@@ -1,10 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-import bg from "../../../../assets/images/backgrounds/page-header-bg-1-1.jpg";
-const PageHeader = ({ title, subTitle }) => {
+import defaultBg from "../../../../assets/images/backgrounds/page-header-bg-1-1.jpg";
+
+const PageHeader = ({ title, subTitle, backgroundImage, extraClass = "" }) => {
+  const bg = backgroundImage || defaultBg;
+
   return (
-    <section className="page-header">
+    <section className={`page-header ${extraClass}`.trim()}>
       <div
         className="page-header__bg"
         style={{ backgroundImage: `url(${bg})` }}

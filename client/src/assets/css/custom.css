@@ -801,3 +801,14 @@ a.main-header__call:hover .main-header__call__number {
   border-color: var(--gotur-primary, #f7921e);
   color: #fff;
 }
+
+.page-header--property {
+  min-height: 460px;
+  padding-top: 160px;
+  padding-bottom: 80px;
+}
+
+.page-header--property .page-header__bg {
+  background-size: cover;
+  background-position: center center;
+}

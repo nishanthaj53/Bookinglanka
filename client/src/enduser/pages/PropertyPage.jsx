@@ -10,6 +10,7 @@ import PageHeader from "../../components/gotur/sections/PageHeader/PageHeader";
 import PropertyListingSection from "../../components/gotur/sections/TourListingPage/PropertyListingSection";
 import {
   PROPERTY_LISTINGS,
+  PROPERTY_TYPE_BANNERS,
   filterProperties,
 } from "../../data/propertyListings";
 
@@ -46,6 +47,8 @@ export default function PropertyPage() {
   );
 
   const listings = useMemo(() => filterProperties(applied), [applied]);
+  const bannerImage =
+    PROPERTY_TYPE_BANNERS[applied.type] || PROPERTY_TYPE_BANNERS[""];
 
   const syncUrl = (next) => {
     const params = new URLSearchParams();
@@ -74,7 +77,12 @@ export default function PropertyPage() {
       <TopbarOne />
       <HeaderTwo />
       <HeaderTwoCloned />
-      <PageHeader title="Property for sale" subTitle="Property" />
+      <PageHeader
+        title="Property for sale"
+        subTitle="Property"
+        backgroundImage={bannerImage}
+        extraClass="page-header--property"
+      />
       <PropertyListingSection
         listings={listings}
         filters={filters}

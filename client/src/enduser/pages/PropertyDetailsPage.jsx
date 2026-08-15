@@ -35,7 +35,12 @@ export default function PropertyDetailsPage() {
       <TopbarOne />
       <HeaderTwo />
       <HeaderTwoCloned />
-      <PageHeader title={item?.name || "Property"} subTitle="Property" />
+      <PageHeader
+        title={item?.name || "Property"}
+        subTitle="Property"
+        backgroundImage={item?.bannerImage || item?.image}
+        extraClass="page-header--property"
+      />
       <section className="destination-details section-space">
         <Container>
           {!item && (
