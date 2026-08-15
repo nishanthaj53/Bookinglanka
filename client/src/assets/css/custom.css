@@ -215,7 +215,9 @@ body.rtl .main-slider-one__destinations__hover {
    Topbar (home-boxed style): circle icons for phone/mail/location
    ----------------------------------------------------------------- */
 .top-one__info__item i,
-.top-one__right .top-one__info__item i {
+.top-one__info__item .top-one__info__icon,
+.top-one__right .top-one__info__item i,
+.top-one__right .top-one__info__item .top-one__info__icon {
   width: 28px;
   height: 28px;
   display: inline-flex;
@@ -226,6 +228,11 @@ body.rtl .main-slider-one__destinations__hover {
   color: #ffffff;
   font-size: 14px;
   margin-right: 10px;
+}
+
+.top-one__info__icon svg {
+  display: block;
+  color: inherit;
 }
 
 .top-one__right .top-one__info__item {

@@ -152,7 +152,11 @@ const AboutOne = ({ extraclass = "" }) => {
                   </div>
                   <div className="about-one__button__call__content">
                     <span>{button.callText}</span>
-                    <a href={`tel:${button.phoneTel || button.phone}`}>
+                    <a
+                      href={button.whatsappUrl || `tel:${button.phoneTel || button.phone}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       {button.phone}
                     </a>
                   </div>

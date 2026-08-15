@@ -15,8 +15,10 @@ export const footerOneData = {
     email: SITE_CONTACT.email,
     phone: SITE_CONTACT.phone,
     phoneTel: SITE_CONTACT.phoneTel,
+    whatsappUrl: SITE_CONTACT.whatsappUrl,
     addressLine: SITE_CONTACT.addressLine,
     mapsSearchUrl: SITE_CONTACT.mapsSearchUrl,
     hours: SITE_CONTACT.hours,
+    companyName: SITE_CONTACT.companyName,
   },
 };

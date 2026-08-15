@@ -47,6 +47,7 @@ export default function HotelsList() {
   };
 
   useEffect(() => {
+    document.title = "Booking Lanka";
     fetchHotels();
   }, []);
 

@@ -35,6 +35,7 @@ export const aboutOneData = {
     callText: "Call Us Now",
     phone: SITE_CONTACT.phone,
     phoneTel: SITE_CONTACT.phoneTel,
+    whatsappUrl: SITE_CONTACT.whatsappUrl,
   },
 
   images: {

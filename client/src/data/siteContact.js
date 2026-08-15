@@ -1,16 +1,18 @@
 /**
- * Official Booking Lanka contact details (used across header, topbar, footer, contact page, about).
+ * Official Booking Lanka contact details (header, topbar, footer, contact, about).
  */
 export const SITE_CONTACT = {
   email: "info@bookinglanka.com",
-  /** Human-readable */
-  phone: "+94 11 2020 400",
-  /** Use in tel: links (digits after +) */
-  phoneTel: "+94112020400",
-  addressLine: "No 10, David Rd, Wellawatta",
+  phone: "07145 55 002",
+  /** WhatsApp / tel digits with country code */
+  phoneTel: "+94714555002",
+  whatsappUrl: "https://wa.me/94714555002",
+  addressLine: "487 A Galle Road, Colombo 06, Sri Lanka",
+  addressLines: ["487 A Galle Road", "Colombo 06", "Sri Lanka"],
   hours: "Mon – Fri: 9:00 AM – 6:00 PM",
+  companyName: "Kalki cretion (Pvt)LTD",
   mapsSearchUrl:
-    "https://www.google.com/maps/search/?api=1&query=No+10+David+Rd+Wellawatta+Colombo+Sri+Lanka",
+    "https://www.google.com/maps/search/?api=1&query=487+A+Galle+Road+Colombo+06+Sri+Lanka",
   mapEmbedUrl:
-    "https://maps.google.com/maps?q=No+10+David+Road+Wellawatta+Colombo+Sri+Lanka&z=16&output=embed",
+    "https://maps.google.com/maps?q=487+A+Galle+Road+Colombo+06+Sri+Lanka&z=16&output=embed",
 };

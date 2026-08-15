@@ -2,6 +2,7 @@
 import React from "react";
 import { Container } from "react-bootstrap";
 import { topbarOne } from "../../../../data/topbarOne";
+import ContactInfoIcon from "../../../common/ContactInfoIcon";
 
 function SocialIcon({ platform }) {
   const p = String(platform || "").toLowerCase();
@@ -60,15 +61,26 @@ const TopbarOne = ({ extraClass }) => {
           <ul className="list-unstyled top-one__info">
             {leftItems.map((item, index) => (
               <li className={`top-one__info__item ${extraClass === "top-one--two" ? "special" : ""}`} key={index}>
-                <i className={item.iconClass}></i>
-                <a href={item.href}>{item.label}</a>
+                <span className="top-one__info__icon" aria-hidden="true">
+                  <ContactInfoIcon type={item.iconType} size={14} />
+                </span>
+                <a
+                  href={item.href}
+                  {...(item.external
+                    ? { target: "_blank", rel: "noopener noreferrer" }
+                    : {})}
+                >
+                  {item.label}
+                </a>
               </li>
             ))}
           </ul>
 
           <div className="top-one__right">
             <div className="top-one__info__item">
-              <i className={address.iconClass}></i>
+              <span className="top-one__info__icon" aria-hidden="true">
+                <ContactInfoIcon type={address.iconType} size={14} />
+              </span>
               <a href={address.href} target="_blank" rel="noopener noreferrer">
                 {address.label}
               </a>

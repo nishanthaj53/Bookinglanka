@@ -5,6 +5,7 @@ import GetInTouchNavLink from "../../common/GetInTouchNavLink";
 import { navItems } from "../../../../data/navItems";
 import mainLogo from "../../../../assets/images/logo-dark.png";
 import useStore from "../../../../store/useStore";
+import { SITE_CONTACT } from "../../../../data/siteContact";
 
 export default function HeaderInner() {
   const { pathname } = useLocation();
@@ -84,8 +85,10 @@ export default function HeaderInner() {
                 <i className="icon-telephone"></i>
               </div>
               <div className="main-header__call__content">
-                <span className="main-header__call__subtitle">Call Us Now</span>
-                <a href="tel:+94112020400">+94 11 2020 400</a>
+                <span className="main-header__call__subtitle">WhatsApp us</span>
+                <a href={SITE_CONTACT.whatsappUrl} target="_blank" rel="noopener noreferrer">
+                  {SITE_CONTACT.phone}
+                </a>
               </div>
             </div>
 

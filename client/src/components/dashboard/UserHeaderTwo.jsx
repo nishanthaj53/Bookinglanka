@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import GetInTouchNavLink from "../gotur/common/GetInTouchNavLink";
 import logo from "../../assets/images/logo-dark.png";
+import { SITE_CONTACT } from "../../data/siteContact";
 
 /**
  * Same shell as landing HeaderTwo, with authenticated primary links.
@@ -80,8 +81,10 @@ export default function UserHeaderTwo({ onLogout, cloned = false }) {
                 <i className="icon-telephone" />
               </div>
               <div className="main-header__call__content">
-                <span className="main-header__call__subtitle">Call us now</span>
-                <a href="tel:+94112020400">+94 11 2020 400</a>
+                <span className="main-header__call__subtitle">WhatsApp us</span>
+                <a href={SITE_CONTACT.whatsappUrl} target="_blank" rel="noopener noreferrer">
+                  {SITE_CONTACT.phone}
+                </a>
               </div>
             </div>
 

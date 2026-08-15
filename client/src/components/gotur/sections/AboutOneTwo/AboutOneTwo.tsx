@@ -121,7 +121,9 @@ const AboutOneTwo: React.FC = () => {
                   </div>
                   <div className='about-one__button__call__content'>
                     <span>Call Us Now</span>
-                    <Link href='tel:+94112020400'>+94 11 2020 400</Link>
+                    <Link href="https://wa.me/94714555002" target="_blank">
+                      07145 55 002
+                    </Link>
                   </div>
                 </div>
               </div>

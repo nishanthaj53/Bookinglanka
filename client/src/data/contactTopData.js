@@ -4,7 +4,7 @@ export const contactItems = [
   {
     icon: "icon-pin",
     title: "Our Address",
-    text: `${SITE_CONTACT.addressLine}, Colombo, Sri Lanka.`,
+    text: SITE_CONTACT.addressLine,
     link: SITE_CONTACT.mapsSearchUrl,
   },
   {
@@ -16,7 +16,7 @@ export const contactItems = [
   {
     icon: "icon-call-3",
     title: SITE_CONTACT.phone,
-    text: "Call us for booking support and travel assistance.",
-    link: `tel:${SITE_CONTACT.phoneTel}`,
+    text: "Chat with us on WhatsApp for booking support and travel assistance.",
+    link: SITE_CONTACT.whatsappUrl,
   },
 ];

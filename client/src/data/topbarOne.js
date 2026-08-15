@@ -4,19 +4,20 @@ export const topbarOne = {
   contactInfo: [
     {
       type: "phone",
-      iconClass: "icon-telephone",
+      iconType: "phone",
       label: SITE_CONTACT.phone,
-      href: `tel:${SITE_CONTACT.phoneTel}`,
+      href: SITE_CONTACT.whatsappUrl,
+      external: true,
     },
     {
       type: "email",
-      iconClass: "icon-email",
+      iconType: "email",
       label: SITE_CONTACT.email,
       href: `mailto:${SITE_CONTACT.email}`,
     },
   ],
   address: {
-    iconClass: "icon-location",
+    iconType: "location",
     label: SITE_CONTACT.addressLine,
     href: SITE_CONTACT.mapsSearchUrl,
   },
