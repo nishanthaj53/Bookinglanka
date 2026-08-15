@@ -22,7 +22,7 @@ export const topbarOne = {
     href: SITE_CONTACT.mapsSearchUrl,
   },
   socialLinks: [
-    { platform: "facebook", iconClass: "fab fa-facebook-f", href: "#" },
+    { platform: "facebook", iconClass: "fab fa-facebook-f", href: SITE_CONTACT.facebookUrl },
     { platform: "x", iconClass: "fab fa-x-twitter", href: "#" },
     { platform: "linkedin", iconClass: "fab fa-linkedin-in", href: "#" },
     { platform: "youtube", iconClass: "fab fa-youtube", href: "#" },

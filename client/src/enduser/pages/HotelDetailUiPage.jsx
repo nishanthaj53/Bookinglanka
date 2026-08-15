@@ -14,6 +14,7 @@ import FooterOne from "../../components/gotur/layout/FooterOne/FooterOne";
 import Layout from "../../components/gotur/layout/Layout/Layout";
 import PageHeader from "../../components/gotur/sections/PageHeader/PageHeader";
 import { feedbackWarning, useFeedback } from "../../context/FeedbackContext";
+import { SITE_CONTACT } from "../../data/siteContact";
 
 // Optional imports if you already have these components
 // import VideoModal from "../../components/common/VideoModal/VideoModal";
@@ -213,7 +214,7 @@ export default function HoteldetailUiPage() {
                     <a href="https://twitter.com" target="_blank" rel="noreferrer">
                       <i className="fab fa-twitter" aria-hidden="true"></i>
                     </a>
-                    <a href="https://facebook.com" target="_blank" rel="noreferrer">
+                    <a href={SITE_CONTACT.facebookUrl} target="_blank" rel="noreferrer">
                       <i className="fab fa-facebook" aria-hidden="true"></i>
                     </a>
                     <a href="https://instagram.com" target="_blank" rel="noreferrer">

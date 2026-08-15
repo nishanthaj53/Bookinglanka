@@ -60,15 +60,15 @@ const TopbarOne = ({ extraClass }) => {
           <ul className="list-unstyled top-one__info">
             {contactInfo.map((item, index) => (
               <li className="top-one__info__item" key={index}>
-                <span className="top-one__info__icon" aria-hidden="true">
-                  <ContactInfoIcon type={item.iconType} size={14} />
-                </span>
                 <a
                   href={item.href}
                   {...(item.external
                     ? { target: "_blank", rel: "noopener noreferrer" }
                     : {})}
                 >
+                  <span className="top-one__info__icon" aria-hidden="true">
+                    <ContactInfoIcon type={item.iconType} size={14} />
+                  </span>
                   {item.label}
                 </a>
               </li>
@@ -80,10 +80,10 @@ const TopbarOne = ({ extraClass }) => {
             </li>
 
             <li className="top-one__info__item">
-              <span className="top-one__info__icon" aria-hidden="true">
-                <ContactInfoIcon type={address.iconType} size={14} />
-              </span>
               <a href={address.href} target="_blank" rel="noopener noreferrer">
+                <span className="top-one__info__icon" aria-hidden="true">
+                  <ContactInfoIcon type={address.iconType} size={14} />
+                </span>
                 {address.label}
               </a>
             </li>
@@ -91,17 +91,21 @@ const TopbarOne = ({ extraClass }) => {
 
           <div className="top-one__right">
             <div className="top-one__social">
-              {socialLinks.map((social, index) => (
-                <a
-                  href={social.href}
-                  key={index}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={social.platform}
-                >
-                  <SocialIcon platform={social.platform} />
-                </a>
-              ))}
+              {socialLinks.map((social, index) => {
+                const isExternal = /^https?:\/\//i.test(social.href || "");
+                return (
+                  <a
+                    href={isExternal ? social.href : undefined}
+                    key={index}
+                    {...(isExternal
+                      ? { target: "_blank", rel: "noopener noreferrer" }
+                      : {})}
+                    aria-label={social.platform}
+                  >
+                    <SocialIcon platform={social.platform} />
+                  </a>
+                );
+              })}
             </div>
           </div>
         </div>

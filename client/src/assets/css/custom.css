@@ -256,6 +256,23 @@ body.rtl .main-slider-one__destinations__hover {
   background: rgba(255, 255, 255, 0.22);
 }
 
+a.main-header__call {
+  text-decoration: none;
+  color: inherit;
+}
+
+.main-header__call__number {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 162%;
+  color: var(--gotur-text, #595959);
+}
+
+a.main-header__call:hover .main-header__call__number {
+  color: var(--gotur-primary, #f7921e);
+}
+
 .top-one__info__item--powered {
   white-space: nowrap;
 }

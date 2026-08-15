@@ -81,17 +81,21 @@ export default function UserHeaderTwo({ onLogout, cloned = false }) {
           <div className="main-header__right">
             <GetInTouchNavLink className="gotur-btn main-header__btn" />
 
-            <div className="main-header__call">
+            <a
+              className="main-header__call"
+              href={SITE_CONTACT.whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="WhatsApp us"
+            >
               <div className="main-header__call__icon">
                 <i className="icon-telephone" />
               </div>
               <div className="main-header__call__content">
                 <span className="main-header__call__subtitle">WhatsApp us</span>
-                <a href={SITE_CONTACT.whatsappUrl} target="_blank" rel="noopener noreferrer">
-                  {SITE_CONTACT.phone}
-                </a>
+                <span className="main-header__call__number">{SITE_CONTACT.phone}</span>
               </div>
-            </div>
+            </a>
 
             <button
               type="button"

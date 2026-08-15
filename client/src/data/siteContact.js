@@ -7,6 +7,7 @@ export const SITE_CONTACT = {
   /** WhatsApp / tel digits with country code */
   phoneTel: "+94714555002",
   whatsappUrl: "https://wa.me/94714555002",
+  facebookUrl: "https://www.facebook.com/share/1c4QLBihJq/?mibextid=wwXIfr",
   addressLine: "487 A Galle Road, Colombo 06, Sri Lanka",
   addressLines: ["487 A Galle Road", "Colombo 06", "Sri Lanka"],
   hours: "Mon – Fri: 9:00 AM – 6:00 PM",
