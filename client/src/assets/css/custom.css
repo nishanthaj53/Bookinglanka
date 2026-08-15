@@ -296,14 +296,19 @@ body.rtl .main-slider-one__destinations__hover {
   .top-one__powered__text {
     font-size: 12px;
   }
+}
 
-  .top-one__powered__sep {
+@media (max-width: 991px) {
+  .top-one {
+    display: block !important;
+  }
+
+  .top-one .top-one__inner {
     display: none;
   }
 
-  .top-one__powered__text a {
-    display: block;
-    margin-top: 2px;
+  .top-one__powered {
+    padding: 8px 12px;
   }
 }
 

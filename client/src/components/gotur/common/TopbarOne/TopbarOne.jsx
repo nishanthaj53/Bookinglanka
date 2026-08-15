@@ -51,7 +51,7 @@ function SocialIcon({ platform }) {
 }
 
 const TopbarOne = ({ extraClass }) => {
-  const { contactInfo, address, socialLinks } = topbarOne;
+  const { contactInfo, socialLinks } = topbarOne;
   const leftItems = contactInfo;
 
   return (
@@ -61,12 +61,6 @@ const TopbarOne = ({ extraClass }) => {
           <p className="top-one__powered__text">
             <span className="top-one__powered__label">Powered by</span>{" "}
             <strong>{SITE_CONTACT.companyName}</strong>
-            <span className="top-one__powered__sep" aria-hidden="true">
-              ·
-            </span>
-            <a href={SITE_CONTACT.mapsSearchUrl} target="_blank" rel="noopener noreferrer">
-              {SITE_CONTACT.addressLines.join(", ")}
-            </a>
           </p>
         </Container>
       </div>
@@ -92,16 +86,6 @@ const TopbarOne = ({ extraClass }) => {
           </ul>
 
           <div className="top-one__right">
-            <div className="top-one__info__item">
-              <span className="top-one__info__icon" aria-hidden="true">
-                <ContactInfoIcon type={address.iconType} size={14} />
-              </span>
-              <a href={address.href} target="_blank" rel="noopener noreferrer">
-                {address.label}
-              </a>
-            </div>
-
-            {/* Social Links */}
             <div className="top-one__social">
               {socialLinks.map((social, index) => (
                 <a
