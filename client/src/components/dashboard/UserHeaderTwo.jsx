@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import GetInTouchNavLink from "../gotur/common/GetInTouchNavLink";
 import logo from "../../assets/images/logo-dark.png";
 import { SITE_CONTACT } from "../../data/siteContact";
+import useStore from "../../store/useStore";
 
 /**
  * Same shell as landing HeaderTwo, with authenticated primary links.
@@ -10,6 +11,10 @@ import { SITE_CONTACT } from "../../data/siteContact";
 export default function UserHeaderTwo({ onLogout, cloned = false }) {
   const location = useLocation();
   const [isSticky, setIsSticky] = useState(false);
+  const changeMobileDrawerTwoStatus = useStore(
+    (state) => state.changeMobileDrawerTwoStatus
+  );
+  const mobileDrawerTwoStatus = useStore((state) => state.mobileDrawerTwoStatus);
 
   useEffect(() => {
     if (!cloned) return undefined;
@@ -88,11 +93,19 @@ export default function UserHeaderTwo({ onLogout, cloned = false }) {
               </div>
             </div>
 
-            <div className="mobile-nav__btn mobile-nav__toggler" aria-hidden="true">
+            <button
+              type="button"
+              className={`mobile-nav__btn mobile-nav__toggler${
+                mobileDrawerTwoStatus ? " is-open" : ""
+              }`}
+              aria-label={mobileDrawerTwoStatus ? "Close menu" : "Open menu"}
+              aria-expanded={mobileDrawerTwoStatus}
+              onClick={changeMobileDrawerTwoStatus}
+            >
               <span />
               <span />
               <span />
-            </div>
+            </button>
           </div>
         </div>
       </div>

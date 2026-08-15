@@ -9,7 +9,7 @@ import { SITE_CONTACT } from "../../../../data/siteContact";
 
 export default function HeaderInner() {
   const { pathname } = useLocation();
-  const { changeSearchPopupStatus, changeMobileDrawerTwoStatus } = useStore();
+  const { changeSearchPopupStatus, changeMobileDrawerTwoStatus, mobileDrawerTwoStatus } = useStore();
 
   const renderSubMenu = (subMenu) => (
     <ul>
@@ -93,8 +93,12 @@ export default function HeaderInner() {
             </div>
 
             <div
-              className="mobile-nav__btn mobile-nav__toggler"
+              className={`mobile-nav__btn mobile-nav__toggler${
+                mobileDrawerTwoStatus ? " is-open" : ""
+              }`}
               onClick={changeMobileDrawerTwoStatus}
+              aria-label={mobileDrawerTwoStatus ? "Close menu" : "Open menu"}
+              aria-expanded={mobileDrawerTwoStatus}
             >
               <span></span>
               <span></span>

@@ -136,7 +136,7 @@ body.rtl .main-slider-one__destinations__hover {
   }
 
   .main-header--two .mobile-nav__btn {
-    margin-left: 16px;
+    margin-left: 0;
   }
 
   .cta-two__thumb__item img {
@@ -451,12 +451,13 @@ body.rtl .main-slider-one__destinations__hover {
     display: block;
   }
 
-  .main-header--two .main-header__brand .mobile-nav__btn {
+  .main-header--two .main-header__brand .mobile-nav__btn,
+  .main-header--two .main-header__right .mobile-nav__btn {
     display: none !important;
   }
 }
 
-/* Mobile / small tablet: hamburger + Get in touch */
+/* Mobile / small tablet: hamburger next to Get in touch */
 @media (max-width: 991px) {
   .main-header--two .main-header__inner {
     display: flex;
@@ -473,6 +474,9 @@ body.rtl .main-slider-one__destinations__hover {
   .main-header--two .main-header__right {
     margin-left: auto;
     flex-shrink: 0;
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
   }
 
   .main-header--two .main-header__btn {
@@ -485,7 +489,26 @@ body.rtl .main-slider-one__destinations__hover {
   }
 
   .main-header--two .main-header__brand .mobile-nav__btn {
+    display: none !important;
+  }
+
+  .main-header--two .main-header__right .mobile-nav__btn {
     display: flex !important;
+    width: 28px;
+    margin-left: 0;
+    padding: 4px 0;
+    background: transparent;
+    border: 0;
+    flex-shrink: 0;
+  }
+
+  .main-header--two .main-header__right .mobile-nav__btn span {
+    background-color: #1d231f !important;
+  }
+
+  .main-header--two .main-header__right .mobile-nav__btn:hover span,
+  .main-header--two .main-header__right .mobile-nav__btn.is-open span {
+    background-color: #f7921e !important;
   }
 
   .main-header--two .main-header__logo {

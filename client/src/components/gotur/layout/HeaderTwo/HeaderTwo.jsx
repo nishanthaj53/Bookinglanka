@@ -14,6 +14,7 @@ const HeaderTwo = () => {
   const changeMobileDrawerTwoStatus = useStore(
     (state) => state.changeMobileDrawerTwoStatus
   );
+  const mobileDrawerTwoStatus = useStore((state) => state.mobileDrawerTwoStatus);
 
   useEffect(() => {
     let mounted = true;
@@ -69,17 +70,6 @@ const HeaderTwo = () => {
                 <img src={logo} alt="Booking Lanka" width={160} height={45} />
               </Link>
             </div>
-
-            <button
-              type="button"
-              className="mobile-nav__btn mobile-nav__toggler"
-              aria-label="Open menu"
-              onClick={changeMobileDrawerTwoStatus}
-            >
-              <span></span>
-              <span></span>
-              <span></span>
-            </button>
           </div>
 
           <nav className="main-header__nav main-header__nav--two main-menu">
@@ -108,6 +98,20 @@ const HeaderTwo = () => {
 
           <div className="main-header__right">
             <GetInTouchNavLink className="gotur-btn main-header__btn" />
+
+            <button
+              type="button"
+              className={`mobile-nav__btn mobile-nav__toggler${
+                mobileDrawerTwoStatus ? " is-open" : ""
+              }`}
+              aria-label={mobileDrawerTwoStatus ? "Close menu" : "Open menu"}
+              aria-expanded={mobileDrawerTwoStatus}
+              onClick={changeMobileDrawerTwoStatus}
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
 
             <div className="main-header__call">
               <div className="main-header__call__icon">

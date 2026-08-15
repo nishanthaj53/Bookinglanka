@@ -15,6 +15,8 @@ export default function HeaderInnerCloned() {
   const {
     changeSearchPopupStatus,
     changeMobileDrawerStatus,
+    changeMobileDrawerTwoStatus,
+    mobileDrawerTwoStatus,
   } = useStore();
 
   const renderSubMenu = (subMenu) => (
@@ -103,8 +105,12 @@ export default function HeaderInnerCloned() {
             </div>
 
             <div
-              className="mobile-nav__btn mobile-nav__toggler"
-              onClick={changeMobileDrawerStatus}
+              className={`mobile-nav__btn mobile-nav__toggler${
+                mobileDrawerTwoStatus ? " is-open" : ""
+              }`}
+              onClick={changeMobileDrawerTwoStatus}
+              aria-label={mobileDrawerTwoStatus ? "Close menu" : "Open menu"}
+              aria-expanded={mobileDrawerTwoStatus}
             >
               <span></span>
               <span></span>
