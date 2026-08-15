@@ -182,8 +182,8 @@ export const SEED_DEMO_HOTELS = [
     amenities: ["Temple-area location", "Courtyard seating", "Bicycle hire", "Airport / station pickup", "Laundry"],
     roomAmenities: ["Air conditioning", "Hot water", "Tea & coffee", "Mosquito netting", "Daily housekeeping"],
     images: [
-      wikimediaFile("Nallur Kandaswamy Temple - Jaffna.jpg"),
-      wikimediaFile("Nallur Kandaswamy Temple - Jaffna2.jpg"),
+      "/images/destinations/jaffna-nallur.png",
+      "/uploads/destinations/jaffna.png",
       "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=1400&q=80",
       "https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1400&q=80",
     ],

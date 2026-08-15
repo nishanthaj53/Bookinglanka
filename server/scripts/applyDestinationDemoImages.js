@@ -13,7 +13,7 @@ const SLUG_TO_PATH = {
   colombo: "/uploads/destinations/colombo.png",
   sigiriya: "/uploads/destinations/sigiriya.png",
   "arugam-bay": "/uploads/destinations/arugam-bay.png",
-  jaffna: "https://commons.wikimedia.org/wiki/Special:FilePath/Nallur%20Kandaswamy%20Temple%20-%20Jaffna.jpg",
+  jaffna: "/images/destinations/jaffna-nallur.png",
   ella: "/uploads/destinations/ella.png",
   "nuwara-eliya": "/uploads/destinations/nuwara-eliya.png",
   kandy: "/uploads/destinations/kandy.png",

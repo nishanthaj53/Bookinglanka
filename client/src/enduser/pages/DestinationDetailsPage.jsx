@@ -24,8 +24,11 @@ function splitLines(text) {
     .map((line) => line.replace(/^[-•]\s*/, "").trim())
     .filter(Boolean);
 }
+
+function toImageSrc(path, apiBase) {
   if (!path) return null;
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  if (path.startsWith("/images/")) return path;
   return `${apiBase.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
 }
 

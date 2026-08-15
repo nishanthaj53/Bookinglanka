@@ -54,6 +54,7 @@ const PopularDestinations = () => {
   const resolveImage = (path) => {
     if (!path) return null;
     if (path.startsWith("http://") || path.startsWith("https://")) return path;
+    if (path.startsWith("/images/")) return path;
     const base = API_BASE?.replace(/\/$/, "") || "";
     return `${base}${path.startsWith("/") ? path : `/${path}`}`;
   };

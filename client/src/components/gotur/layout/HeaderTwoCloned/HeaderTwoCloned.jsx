@@ -100,8 +100,8 @@ const HeaderTwoCloned = () => {
                   key={item.id}
                   className={`${item.subMenu ? "dropdown" : ""} ${
                     item.link &&
-                    item.link !== "/#properties" &&
-                    location.pathname.includes(item.link)
+                    !String(item.link).includes("#") &&
+                    location.pathname.startsWith(item.link)
                       ? "current"
                       : ""
                   }`}

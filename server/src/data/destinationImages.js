@@ -11,11 +11,10 @@ export const DESTINATION_PLACE_IMAGES = {
   sigiriya: wikimediaFile("Sigiriya.jpg"),
   kandy: wikimediaFile("Temple of the Tooth, Kandy.jpg"),
   "nuwara-eliya": wikimediaFile("Nuwara Eliya.jpg"),
-  jaffna: wikimediaFile("Nallur Kandaswamy Temple - Jaffna.jpg"),
+  jaffna: "/images/destinations/jaffna-nallur.png",
 };
 
 export const JAFFNA_GALLERY = [
-  wikimediaFile("Nallur Kandaswamy Temple - Jaffna.jpg"),
-  wikimediaFile("Nallur Kandaswamy Temple - Jaffna2.jpg"),
+  "/images/destinations/jaffna-nallur.png",
   wikimediaFile("Jaffna Fort.jpg"),
 ];

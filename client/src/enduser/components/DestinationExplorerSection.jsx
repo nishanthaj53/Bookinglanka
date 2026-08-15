@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 function resolveImage(url, apiBase) {
   if (!url) return "https://placehold.co/600x380?text=Destination";
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  if (url.startsWith("/images/")) return url;
   const base = (apiBase || "").replace(/\/$/, "");
   return `${base}${url.startsWith("/") ? url : `/${url}`}`;
 }

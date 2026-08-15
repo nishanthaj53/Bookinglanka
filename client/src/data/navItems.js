@@ -34,7 +34,13 @@ export const navItems = [
   {
     id: 58,
     title: "Property",
-    link: "/#properties",
+    link: "/property",
+    subMenu: [
+      { id: 1, title: "All listings", link: "/property" },
+      { id: 2, title: "Land for sale", link: "/property?type=land" },
+      { id: 3, title: "House for sale", link: "/property?type=house" },
+      { id: 4, title: "Apartment for sale", link: "/property?type=apartment" },
+    ],
   },
   {
     id: 1,

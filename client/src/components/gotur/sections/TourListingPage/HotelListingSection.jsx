@@ -26,6 +26,7 @@ function getImageSrc(coverImage, apiBase) {
     return trimmed;
   }
   const path = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+  if (path.startsWith("/images/")) return path;
   const base = (apiBase || "").replace(/\/$/, "");
   return base ? `${base}${path}` : path;
 }

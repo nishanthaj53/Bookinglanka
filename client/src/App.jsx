@@ -23,6 +23,8 @@ import Contact from "./enduser/pages/Contact";
 import AccountEntry from "./enduser/pages/AccountEntry";
 import DestinationDetailsPage from "./enduser/pages/DestinationDetailsPage";
 import DestinationsPage from "./enduser/pages/DestinationsPage";
+import PropertyPage from "./enduser/pages/PropertyPage";
+import PropertyDetailsPage from "./enduser/pages/PropertyDetailsPage";
 import AiPlannerPage from "./enduser/pages/AiPlannerPage";
 // import Hoteldetailui from "./enduser/pages/HotelDetailUiPage";  
 
@@ -74,6 +76,8 @@ export default function App() {
         <Route path="/verify-email" element={<VerifyEmailPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/destinations" element={<DestinationsPage />} />
+        <Route path="/property/:id" element={<PropertyDetailsPage />} />
+        <Route path="/property" element={<PropertyPage />} />
         <Route path="/ai-planner" element={<AiPlannerPage />} />
         <Route path="/destinations/:slug" element={<DestinationDetailsPage />} />
         <Route path="/destinationkandy" element={<Navigate to="/destinations/kandy" replace />} />

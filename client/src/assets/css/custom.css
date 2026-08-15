@@ -784,3 +784,20 @@ a.main-header__call:hover .main-header__call__number {
 .tour-listing-page .sec-title {
   margin-bottom: 40px;
 }
+
+.property-type-chip {
+  border: 1px solid var(--gotur-border-color, #e5e5e5);
+  background: #fff;
+  color: var(--gotur-black, #1d231f);
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.property-type-chip.is-active {
+  background: var(--gotur-primary, #f7921e);
+  border-color: var(--gotur-primary, #f7921e);
+  color: #fff;
+}

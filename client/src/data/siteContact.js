@@ -11,7 +11,7 @@ export const SITE_CONTACT = {
   addressLine: "487 A Galle Road, Colombo 06, Sri Lanka",
   addressLines: ["487 A Galle Road", "Colombo 06", "Sri Lanka"],
   hours: "Mon – Fri: 9:00 AM – 6:00 PM",
-  companyName: "Kalki cretion (Pvt)LTD",
+  companyName: "Kalki creation (Pvt)LTD",
   mapsSearchUrl:
     "https://www.google.com/maps/search/?api=1&query=487+A+Galle+Road+Colombo+06+Sri+Lanka",
   mapEmbedUrl:

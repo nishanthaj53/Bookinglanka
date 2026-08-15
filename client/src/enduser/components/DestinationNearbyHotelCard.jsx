@@ -4,6 +4,7 @@ function getImageSrc(coverImage, apiBase) {
   if (!coverImage) return null;
   const trimmed = String(coverImage).trim();
   if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return trimmed;
+  if (trimmed.startsWith("/images/")) return trimmed;
   const base = (apiBase || "").replace(/\/$/, "");
   const path = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
   return base ? `${base}${path}` : path;
