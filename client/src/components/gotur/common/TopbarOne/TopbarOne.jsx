@@ -51,25 +51,15 @@ function SocialIcon({ platform }) {
 }
 
 const TopbarOne = ({ extraClass }) => {
-  const { contactInfo, socialLinks } = topbarOne;
-  const leftItems = contactInfo;
+  const { contactInfo, address, socialLinks } = topbarOne;
 
   return (
     <div className={`top-one ${extraClass || ""}`}>
-      <div className="top-one__powered">
-        <Container fluid>
-          <p className="top-one__powered__text">
-            <span className="top-one__powered__label">Powered by</span>{" "}
-            <strong>{SITE_CONTACT.companyName}</strong>
-          </p>
-        </Container>
-      </div>
       <Container fluid>
         <div className="top-one__inner">
-          {/* Contact Info */}
           <ul className="list-unstyled top-one__info">
-            {leftItems.map((item, index) => (
-              <li className={`top-one__info__item ${extraClass === "top-one--two" ? "special" : ""}`} key={index}>
+            {contactInfo.map((item, index) => (
+              <li className="top-one__info__item" key={index}>
                 <span className="top-one__info__icon" aria-hidden="true">
                   <ContactInfoIcon type={item.iconType} size={14} />
                 </span>
@@ -83,6 +73,20 @@ const TopbarOne = ({ extraClass }) => {
                 </a>
               </li>
             ))}
+
+            <li className="top-one__info__item top-one__info__item--powered">
+              <span className="top-one__powered__label">Powered by</span>{" "}
+              <strong>{SITE_CONTACT.companyName}</strong>
+            </li>
+
+            <li className="top-one__info__item">
+              <span className="top-one__info__icon" aria-hidden="true">
+                <ContactInfoIcon type={address.iconType} size={14} />
+              </span>
+              <a href={address.href} target="_blank" rel="noopener noreferrer">
+                {address.label}
+              </a>
+            </li>
           </ul>
 
           <div className="top-one__right">
