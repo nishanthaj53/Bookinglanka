@@ -273,38 +273,67 @@ a.main-header__call:hover .main-header__call__number {
   color: var(--gotur-primary, #f7921e);
 }
 
-.top-one__info__item--powered {
-  white-space: nowrap;
+.top-one .top-one__inner {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 7px 15px;
 }
 
-.top-one__info__item--powered .top-one__powered__label {
-  opacity: 0.85;
-  font-weight: 400;
-  margin-right: 4px;
+.top-one .top-one__info {
+  gap: 16px;
 }
 
-.top-one__info__item--powered strong {
-  font-weight: 700;
-}
-
-.top-one__info__item {
+.top-one .top-one__info__item,
+.top-one .top-one__info__item a {
   display: inline-flex;
   align-items: center;
 }
 
-@media (max-width: 1399px) {
-  .top-one .top-one__inner {
-    flex-wrap: wrap;
-    gap: 8px 16px;
+.top-one .top-one__info__item,
+.top-one .top-one__powered {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.top-one__powered {
+  margin: 0;
+  text-align: center;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.top-one__powered__label {
+  opacity: 0.85;
+  font-weight: 400;
+}
+
+.top-one__powered strong {
+  font-weight: 700;
+}
+
+.top-one .top-one__right {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.top-one .top-one__address {
+  font-size: 13px;
+}
+
+@media (max-width: 1199px) {
+  .top-one .top-one__info__item,
+  .top-one .top-one__powered,
+  .top-one .top-one__address {
+    font-size: 12px;
   }
 
   .top-one .top-one__info {
-    flex-wrap: wrap;
-    gap: 8px 16px;
-  }
-
-  .top-one .top-one__info__item {
-    font-size: 14px;
+    gap: 12px;
   }
 }
 
@@ -315,34 +344,18 @@ a.main-header__call:hover .main-header__call__number {
 
   .top-one .top-one__inner {
     display: flex !important;
-    flex-wrap: wrap;
-    align-items: center;
     justify-content: center;
-    gap: 8px 14px;
     padding: 8px 12px;
   }
 
-  .top-one .top-one__info {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px 14px;
-    row-gap: 8px;
-  }
-
-  .top-one .top-one__info__item {
-    font-size: 12px;
-    line-height: 1.4;
-  }
-
-  .top-one .top-one__info__item .top-one__info__icon {
-    width: 22px;
-    height: 22px;
-    margin-right: 6px;
-  }
-
+  .top-one .top-one__info--left,
   .top-one .top-one__right {
-    width: 100%;
-    justify-content: center;
+    display: none;
+  }
+
+  .top-one .top-one__powered {
+    font-size: 12px;
+    white-space: normal;
   }
 }
 

@@ -57,7 +57,7 @@ const TopbarOne = ({ extraClass }) => {
     <div className={`top-one ${extraClass || ""}`}>
       <Container fluid>
         <div className="top-one__inner">
-          <ul className="list-unstyled top-one__info">
+          <ul className="list-unstyled top-one__info top-one__info--left">
             {contactInfo.map((item, index) => (
               <li className="top-one__info__item" key={index}>
                 <a
@@ -73,23 +73,22 @@ const TopbarOne = ({ extraClass }) => {
                 </a>
               </li>
             ))}
+          </ul>
 
-            <li className="top-one__info__item top-one__info__item--powered">
-              <span className="top-one__powered__label">Powered by</span>{" "}
-              <strong>{SITE_CONTACT.companyName}</strong>
-            </li>
+          <p className="top-one__powered">
+            <span className="top-one__powered__label">Powered by</span>{" "}
+            <strong>{SITE_CONTACT.companyName}</strong>
+          </p>
 
-            <li className="top-one__info__item">
+          <div className="top-one__right">
+            <div className="top-one__info__item top-one__address">
               <a href={address.href} target="_blank" rel="noopener noreferrer">
                 <span className="top-one__info__icon" aria-hidden="true">
                   <ContactInfoIcon type={address.iconType} size={14} />
                 </span>
                 {address.label}
               </a>
-            </li>
-          </ul>
-
-          <div className="top-one__right">
+            </div>
             <div className="top-one__social">
               {socialLinks.map((social, index) => {
                 const isExternal = /^https?:\/\//i.test(social.href || "");
