@@ -256,6 +256,57 @@ body.rtl .main-slider-one__destinations__hover {
   background: rgba(255, 255, 255, 0.22);
 }
 
+.top-one__powered {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 6px 0;
+}
+
+.top-one__powered__text {
+  margin: 0;
+  text-align: center;
+  color: #ffffff;
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+.top-one__powered__label {
+  opacity: 0.85;
+  font-weight: 400;
+}
+
+.top-one__powered__text strong {
+  font-weight: 700;
+}
+
+.top-one__powered__sep {
+  margin: 0 8px;
+  opacity: 0.55;
+}
+
+.top-one__powered__text a {
+  color: inherit;
+}
+
+.top-one__powered__text a:hover {
+  color: var(--gotur-primary, #f7921e);
+}
+
+@media (max-width: 767px) {
+  .top-one__powered__text {
+    font-size: 12px;
+  }
+
+  .top-one__powered__sep {
+    display: none;
+  }
+
+  .top-one__powered__text a {
+    display: block;
+    margin-top: 2px;
+  }
+}
+
 /* Footer: ensure inline SVG icons match theme color */
 .footer-widget__list__icon svg {
   display: block;

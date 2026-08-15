@@ -2,6 +2,7 @@
 import React from "react";
 import { Container } from "react-bootstrap";
 import { topbarOne } from "../../../../data/topbarOne";
+import { SITE_CONTACT } from "../../../../data/siteContact";
 import ContactInfoIcon from "../../../common/ContactInfoIcon";
 
 function SocialIcon({ platform }) {
@@ -55,6 +56,20 @@ const TopbarOne = ({ extraClass }) => {
 
   return (
     <div className={`top-one ${extraClass || ""}`}>
+      <div className="top-one__powered">
+        <Container fluid>
+          <p className="top-one__powered__text">
+            <span className="top-one__powered__label">Powered by</span>{" "}
+            <strong>{SITE_CONTACT.companyName}</strong>
+            <span className="top-one__powered__sep" aria-hidden="true">
+              ·
+            </span>
+            <a href={SITE_CONTACT.mapsSearchUrl} target="_blank" rel="noopener noreferrer">
+              {SITE_CONTACT.addressLines.join(", ")}
+            </a>
+          </p>
+        </Container>
+      </div>
       <Container fluid>
         <div className="top-one__inner">
           {/* Contact Info */}
