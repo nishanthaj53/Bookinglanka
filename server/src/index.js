@@ -51,6 +51,12 @@ const ALLOWED_ORIGINS = (process.env.CORS_ORIGIN || "http://localhost:5173")
 function isAllowedOrigin(origin) {
   if (!origin) return true;
   if (ALLOWED_ORIGINS.includes(origin)) return true;
+  if (
+    origin === "https://www.bookinglanka.com" ||
+    origin === "https://bookinglanka.com"
+  ) {
+    return true;
+  }
   // Vercel gives each deployment its own URL (e.g. bookinglanka-abc123.vercel.app)
   if (/^https:\/\/[\w-]+\.vercel\.app$/.test(origin)) return true;
   return false;
