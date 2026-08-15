@@ -37,6 +37,7 @@ import stripeWebhookRouter from "./routes/webhooks/stripe.js";
 // Prisma
 import { prisma } from "./db/client.js";
 import { ensureDefaultCommissionRule } from "./services/commission.js";
+import { ensureDemoCatalog } from "./services/ensureDemoCatalog.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -169,6 +170,8 @@ app.listen(PORT, async () => {
   try {
     await ensureDefaultCommissionRule();
     console.log("✅ Default commission rule ready (15% unless overridden)");
+    await ensureDemoCatalog();
+    console.log("✅ Destinations and Jaffna hotels ready");
   } catch (e) {
     console.warn("Commission default seed skipped:", e.message);
   }

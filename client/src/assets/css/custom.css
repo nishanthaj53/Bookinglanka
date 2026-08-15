@@ -174,6 +174,107 @@ body.rtl .main-slider-one__destinations__hover {
   }
 }
 
+.destination-theme .destination-details__title {
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.destination-theme .destination-details__text {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #3d4440;
+  margin-bottom: 14px;
+}
+
+.destination-theme .destination-details__why-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.destination-theme .destination-details__why-list li {
+  position: relative;
+  padding: 10px 0 10px 28px;
+  font-size: 16px;
+  line-height: 1.7;
+  color: #3d4440;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.destination-theme .destination-details__why-list li:last-child {
+  border-bottom: 0;
+}
+
+.destination-theme .destination-details__why-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 18px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--destination-accent, var(--gotur-primary, #f7921e));
+}
+
+.destination-theme .destination-details__nearby-lead {
+  font-size: 15px;
+  color: #5c6560;
+  margin: -8px 0 22px;
+}
+
+.destination-theme .destination-details__title {
+  font-family: var(--destination-title-font, inherit);
+  color: var(--destination-title-color, var(--gotur-black, #1d231f));
+}
+
+.destination-theme--galle {
+  --destination-accent: #0e7490;
+  --destination-title-color: #0f4c5c;
+  --destination-title-font: Georgia, "Times New Roman", serif;
+}
+
+.destination-theme--arugam-bay {
+  --destination-accent: #0284c7;
+  --destination-title-color: #075985;
+  --destination-title-font: "Trebuchet MS", "Segoe UI", sans-serif;
+}
+
+.destination-theme--ella {
+  --destination-accent: #4d7c0f;
+  --destination-title-color: #3f6212;
+  --destination-title-font: Georgia, "Times New Roman", serif;
+}
+
+.destination-theme--colombo {
+  --destination-accent: #c2410c;
+  --destination-title-color: #1e293b;
+  --destination-title-font: "Segoe UI", system-ui, sans-serif;
+}
+
+.destination-theme--sigiriya {
+  --destination-accent: #c2410c;
+  --destination-title-color: #9a3412;
+  --destination-title-font: Georgia, "Times New Roman", serif;
+}
+
+.destination-theme--kandy {
+  --destination-accent: #b45309;
+  --destination-title-color: #7c2d12;
+  --destination-title-font: Georgia, "Times New Roman", serif;
+}
+
+.destination-theme--nuwara-eliya {
+  --destination-accent: #047857;
+  --destination-title-color: #134e4a;
+  --destination-title-font: Georgia, "Times New Roman", serif;
+}
+
+.destination-theme--jaffna {
+  --destination-accent: #ca8a04;
+  --destination-title-color: #7c2d12;
+  --destination-title-font: Georgia, "Noto Serif", "Times New Roman", serif;
+}
+
 /* Blog “Travel Insights” cards: ~338×240 crop */
 .blog-two .blog-card-two--one .blog-card-two__image img {
   aspect-ratio: 338 / 240;

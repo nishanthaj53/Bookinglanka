@@ -1,5 +1,5 @@
 /**
- * Assigns testingmanager@gmail.com as owner of the 10 seed demo hotels, and ensures:
+ * Assigns testingmanager@gmail.com as owner of the seed demo hotels, and ensures:
  * - Google Maps embed (lat/lng)
  * - Hotel gallery: cover + 3 extra images (from seed catalog)
  * - At least 2 hotel amenity strip images
@@ -27,6 +27,9 @@ const PROPERTY_TYPES = [
   "City Hotel",
   "Boutique",
   "Resort",
+  "Heritage Guesthouse",
+  "Boutique",
+  "Beach Lodge",
 ];
 
 const HIGHLIGHTS = ["Free Wi-Fi", "On-site dining", "24-hour reception"];
@@ -107,7 +110,15 @@ async function syncHotel(managerId, def, hotelIndex) {
     return;
   }
   const embed = mapEmbed(def.latitude, def.longitude);
-  const rooms = roomPlan(hotelIndex);
+  const rooms = Array.isArray(def.rooms) && def.rooms.length
+    ? def.rooms.map((room) => ({
+        name: room.name,
+        capacity: room.capacity,
+        pricePerNight: room.pricePerNight,
+        description: room.description,
+        imageUrls: room.images || room.imageUrls || [],
+      }))
+    : roomPlan(hotelIndex);
 
   await prisma.$transaction(async (tx) => {
     await tx.hotel.update({
@@ -120,10 +131,10 @@ async function syncHotel(managerId, def, hotelIndex) {
         latitude: def.latitude,
         longitude: def.longitude,
         mapEmbedUrl: embed,
-        propertyType: PROPERTY_TYPES[hotelIndex % PROPERTY_TYPES.length],
-        highlights: HIGHLIGHTS,
-        amenities: AMENITIES_ARR,
-        roomAmenities: ROOM_AMENITIES_ARR,
+        propertyType: def.propertyType || PROPERTY_TYPES[hotelIndex % PROPERTY_TYPES.length],
+        highlights: def.highlights || HIGHLIGHTS,
+        amenities: def.amenities || AMENITIES_ARR,
+        roomAmenities: def.roomAmenities || ROOM_AMENITIES_ARR,
         checkInTime: "2:00 PM",
         checkOutTime: "11:00 AM",
         basePrice: rooms[0].pricePerNight,

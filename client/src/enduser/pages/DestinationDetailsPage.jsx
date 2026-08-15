@@ -11,7 +11,19 @@ import FooterOne from "../../components/gotur/layout/FooterOne/FooterOne";
 import Layout from "../../components/gotur/layout/Layout/Layout";
 import DestinationNearbyHotelCard from "../components/DestinationNearbyHotelCard";
 
-function toImageSrc(path, apiBase) {
+function splitParagraphs(text) {
+  return String(text || "")
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+}
+
+function splitLines(text) {
+  return String(text || "")
+    .split(/\n/)
+    .map((line) => line.replace(/^[-•]\s*/, "").trim())
+    .filter(Boolean);
+}
   if (!path) return null;
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
   return `${apiBase.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
@@ -80,7 +92,7 @@ export default function DestinationDetailsPage() {
       <HeaderTwo />
       <HeaderTwoCloned />
 
-      <section className="destination-details section-space">
+      <section className={`destination-details section-space destination-theme destination-theme--${slug}`}>
         <div className="container">
           {loading && <p>Loading destination...</p>}
           {!loading && error && <p style={{ color: "red" }}>{error}</p>}
@@ -117,28 +129,48 @@ export default function DestinationDetailsPage() {
               <div className="row gutter-y-30">
                 <div className="col-lg-8">
                   <div className="destination-details__content">
-                    <div className="destination-details__content__item">
+                    <div className="destination-details__content__item destination-details__about">
                       <h3 className="destination-details__title">
                         About {destination.name}
                       </h3>
-                      <p className="destination-details__text">
-                        {destination.overview || "Details will be updated by admin soon."}
-                      </p>
+                      {splitParagraphs(destination.overview).map((para, idx) => (
+                        <p className="destination-details__text" key={idx}>
+                          {para}
+                        </p>
+                      ))}
+                      {!destination.overview && (
+                        <p className="destination-details__text">
+                          Details will be updated by admin soon.
+                        </p>
+                      )}
                     </div>
 
-                    <div className="destination-details__content__item">
+                    <div className="destination-details__content__item destination-details__why">
                       <h3 className="destination-details__title">
                         Why Visit {destination.name}
                       </h3>
-                      <p className="destination-details__text">
-                        {destination.whyVisit || "This destination is worth exploring with nearby stays."}
-                      </p>
+                      {splitLines(destination.whyVisit).length > 1 ? (
+                        <ul className="destination-details__why-list">
+                          {splitLines(destination.whyVisit).map((line, idx) => (
+                            <li key={idx}>{line}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="destination-details__text">
+                          {destination.whyVisit ||
+                            "This destination is worth exploring with nearby stays."}
+                        </p>
+                      )}
                     </div>
 
-                    <div className="destination-details__content__item">
+                    <div className="destination-details__content__item destination-details__nearby">
                       <h3 className="destination-details__title">
-                        Nearby Active Hotels
+                        Nearby Hotels in {destination.name}
                       </h3>
+                      <p className="destination-details__nearby-lead">
+                        Active stays in {destination.town || destination.name}
+                        {destination.district ? `, ${destination.district}` : ""}.
+                      </p>
                       <div className="row gutter-y-30">
                         {(destination.nearbyHotels || []).map((hotel) => (
                           <div className="col-md-6" key={hotel.id}>
@@ -155,7 +187,9 @@ export default function DestinationDetailsPage() {
 
                     {!!destination.faqs?.length && (
                       <div className="destination-details__content__faq">
-                        <h3 className="destination-details__title">Free Ask Question?</h3>
+                        <h3 className="destination-details__title">
+                          Frequently asked questions
+                        </h3>
                         <div className="faq-page__accordion faq-accordion gotur-accordion">
                           <Accordion defaultActiveKey="0">
                             {destination.faqs.map((faq, idx) => (
