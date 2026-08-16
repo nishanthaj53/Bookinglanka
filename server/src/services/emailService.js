@@ -9,15 +9,66 @@ import {
   wrapEmailHtml,
 } from './emailTemplates.js'
 
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: Number(process.env.EMAIL_PORT || 465),
-  secure: process.env.EMAIL_SECURE === 'true',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-})
+function emailUser() {
+  return String(process.env.EMAIL_USER || '').trim()
+}
+
+function emailPass() {
+  return String(process.env.EMAIL_PASS || '').replace(/\s+/g, '')
+}
+
+function mailFrom() {
+  const user = emailUser()
+  const named = process.env.EMAIL_FROM?.trim()
+  // Gmail SMTP only allows the authenticated mailbox as From.
+  if (user && /@gmail\.com$/i.test(user)) {
+    return `Booking Lanka <${user}>`
+  }
+  return named || (user ? `Booking Lanka <${user}>` : undefined)
+}
+
+function isEmailConfigured() {
+  return Boolean(process.env.EMAIL_HOST && emailUser() && emailPass())
+}
+
+let transporter
+
+function getTransporter() {
+  if (!isEmailConfigured()) {
+    throw new Error(
+      'Email is not configured. Set EMAIL_HOST, EMAIL_USER, and EMAIL_PASS on the API server.'
+    )
+  }
+  if (!transporter) {
+    transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: Number(process.env.EMAIL_PORT || 465),
+      secure: process.env.EMAIL_SECURE === 'true' || Number(process.env.EMAIL_PORT || 465) === 465,
+      auth: {
+        user: emailUser(),
+        pass: emailPass(),
+      },
+    })
+  }
+  return transporter
+}
+
+export async function verifyEmailTransport() {
+  if (!isEmailConfigured()) {
+    console.warn(
+      '⚠️ Email skipped: EMAIL_HOST / EMAIL_USER / EMAIL_PASS are not set on this server.'
+    )
+    return false
+  }
+  try {
+    await getTransporter().verify()
+    console.log(`✅ Email SMTP ready (${process.env.EMAIL_HOST} as ${emailUser()})`)
+    return true
+  } catch (err) {
+    console.error('❌ Email SMTP verify failed:', err.message)
+    return false
+  }
+}
 
 export function createEmailVerificationToken(user, portal = 'user') {
   return jwt.sign(
@@ -36,21 +87,16 @@ export function createEmailVerificationToken(user, portal = 'user') {
  * Send a generic email (HTML or plain text)
  */
 export async function sendEmail({ to, subject, text, html, attachments }) {
-  try {
-    const info = await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
-      to,
-      subject,
-      text,
-      html,
-      attachments,
-    })
-    console.log(`📧 Email sent to ${to}: ${info.messageId}`)
-    return info
-  } catch (err) {
-    console.error('❌ Email sending failed:', err.message)
-    throw err
-  }
+  const info = await getTransporter().sendMail({
+    from: mailFrom(),
+    to,
+    subject,
+    text,
+    html,
+    attachments,
+  })
+  console.log(`📧 Email sent to ${to}: ${info.messageId}`)
+  return info
 }
 
 export async function sendEmailVerificationEmail(userEmail, token, portal = 'user') {

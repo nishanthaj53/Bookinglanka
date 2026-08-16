@@ -38,6 +38,7 @@ import stripeWebhookRouter from "./routes/webhooks/stripe.js";
 import { prisma } from "./db/client.js";
 import { ensureDefaultCommissionRule } from "./services/commission.js";
 import { ensureDemoCatalog } from "./services/ensureDemoCatalog.js";
+import { verifyEmailTransport } from "./services/emailService.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -172,6 +173,7 @@ app.listen(PORT, async () => {
     console.log("✅ Default commission rule ready (15% unless overridden)");
     await ensureDemoCatalog();
     console.log("✅ Destinations and Jaffna hotels ready");
+    await verifyEmailTransport();
   } catch (e) {
     console.warn("Commission default seed skipped:", e.message);
   }

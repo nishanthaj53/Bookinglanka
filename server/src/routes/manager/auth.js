@@ -12,11 +12,7 @@ const router = express.Router()
 
 async function issueVerificationEmail(user) {
   const token = createEmailVerificationToken(user, 'manager')
-  try {
-    await sendEmailVerificationEmail(user.email, token, 'manager')
-  } catch (e) {
-    console.error('Manager verification email failed:', e?.message || e)
-  }
+  await sendEmailVerificationEmail(user.email, token, 'manager')
 }
 
 // MANAGER SIGNUP (role is auto-assigned)
@@ -50,11 +46,19 @@ router.post('/signup', async (req, res) => {
       })
 
       if (!updated.emailVerified) {
-        await issueVerificationEmail(updated)
+        let emailSent = true
+        try {
+          await issueVerificationEmail(updated)
+        } catch (e) {
+          emailSent = false
+          console.error('Manager verification email failed:', e?.message || e)
+        }
         return res.json({
-          message:
-            'Manager role added. Please verify your email before signing in to the manager portal.',
+          message: emailSent
+            ? 'Manager role added. Please verify your email before signing in to the manager portal.'
+            : 'Manager role added, but the verification email could not be sent. Use Resend on the next screen.',
           requiresVerification: true,
+          emailSent,
           user: { id: updated.id, email: updated.email, roles: updated.roles },
         })
       }
@@ -76,12 +80,20 @@ router.post('/signup', async (req, res) => {
       },
     })
 
-    await issueVerificationEmail(user)
+    let emailSent = true
+    try {
+      await issueVerificationEmail(user)
+    } catch (e) {
+      emailSent = false
+      console.error('Manager verification email failed:', e?.message || e)
+    }
 
     res.status(201).json({
-      message:
-        'Manager account created. Please check your email to verify your address before signing in.',
+      message: emailSent
+        ? 'Manager account created. Please check your email to verify your address before signing in.'
+        : 'Manager account created, but the verification email could not be sent. Use Resend on the next screen.',
       requiresVerification: true,
+      emailSent,
       user: { id: user.id, email: user.email, roles: user.roles },
     })
   } catch (err) {

@@ -37,6 +37,13 @@ export default function ManagerSignup() {
 
       if (data.requiresVerification) {
         setRegisteredEmail(data.user?.email || email);
+        if (data.emailSent === false) {
+          feedbackWarning(
+            showFeedback,
+            data.message ||
+              "Account created, but the verification email could not be sent. Use Resend below."
+          );
+        }
         return;
       }
 

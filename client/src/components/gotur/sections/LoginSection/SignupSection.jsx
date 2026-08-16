@@ -29,6 +29,13 @@ export default function SignupSection() {
     try {
       const res = await signup(data.email, data.password);
       setRegisteredEmail(res.user?.email || data.email);
+      if (res.emailSent === false) {
+        feedbackWarning(
+          showFeedback,
+          res.message ||
+            "Account created, but the verification email could not be sent. Use Resend below."
+        );
+      }
     } catch (err) {
       feedbackError(showFeedback, err.message || "Signup failed");
     } finally {

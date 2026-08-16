@@ -14,11 +14,7 @@ const router = Router()
 
 async function issueVerificationEmail(user, portal = 'user') {
   const token = createEmailVerificationToken(user, portal)
-  try {
-    await sendEmailVerificationEmail(user.email, token, portal)
-  } catch (e) {
-    console.error('Verification email failed:', e?.message || e)
-  }
+  await sendEmailVerificationEmail(user.email, token, portal)
 }
 
 function requiresEmailVerification(user) {
@@ -49,12 +45,20 @@ router.post('/signup', async (req, res) => {
       },
     })
 
-    await issueVerificationEmail(user, 'user')
+    let emailSent = true
+    try {
+      await issueVerificationEmail(user, 'user')
+    } catch (e) {
+      emailSent = false
+      console.error('Verification email failed:', e?.message || e)
+    }
 
     res.status(201).json({
-      message:
-        'Account created. Please check your email to verify your address before signing in.',
+      message: emailSent
+        ? 'Account created. Please check your email to verify your address before signing in.'
+        : 'Account created, but the verification email could not be sent. Use Resend on the next screen, or try again later.',
       requiresVerification: true,
+      emailSent,
       user: { id: user.id, email: user.email, roles: user.roles },
     })
   } catch (err) {
@@ -165,7 +169,14 @@ router.post('/resend-verification', async (req, res) => {
 
     const user = await prisma.user.findUnique({ where: { email } })
     if (user && !user.emailVerified) {
-      await issueVerificationEmail(user, portal === 'manager' ? 'manager' : 'user')
+      try {
+        await issueVerificationEmail(user, portal === 'manager' ? 'manager' : 'user')
+      } catch (e) {
+        console.error('Resend verification email failed:', e?.message || e)
+        return res.status(502).json({
+          error: 'Could not send the verification email. Please try again in a few minutes.',
+        })
+      }
     }
 
     res.json({
@@ -197,6 +208,9 @@ router.post('/forgot-password', async (req, res) => {
         await sendPasswordResetEmail(user.email, token)
       } catch (e) {
         console.error('Password reset email failed:', e?.message || e)
+        return res.status(502).json({
+          error: 'Could not send the reset email. Please try again in a few minutes.',
+        })
       }
     }
 
