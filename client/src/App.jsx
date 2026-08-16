@@ -26,6 +26,8 @@ import DestinationDetailsPage from "./enduser/pages/DestinationDetailsPage";
 import DestinationsPage from "./enduser/pages/DestinationsPage";
 import PropertyPage from "./enduser/pages/PropertyPage";
 import PropertyDetailsPage from "./enduser/pages/PropertyDetailsPage";
+import ArticlesPage from "./enduser/pages/ArticlesPage";
+import ArticleDetailsPage from "./enduser/pages/ArticleDetailsPage";
 import AiPlannerPage from "./enduser/pages/AiPlannerPage";
 // import Hoteldetailui from "./enduser/pages/HotelDetailUiPage";  
 
@@ -78,6 +80,10 @@ export default function App() {
         <Route path="/verify-email" element={<VerifyEmailPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/destinations" element={<DestinationsPage />} />
+        <Route path="/articles/:slug" element={<ArticleDetailsPage />} />
+        <Route path="/articles" element={<ArticlesPage />} />
+        <Route path="/blog-details-left" element={<Navigate to="/articles" replace />} />
+        <Route path="/blog-details-right" element={<Navigate to="/articles" replace />} />
         <Route path="/property/:id" element={<PropertyDetailsPage />} />
         <Route path="/property" element={<PropertyPage />} />
         <Route path="/ai-planner" element={<AiPlannerPage />} />

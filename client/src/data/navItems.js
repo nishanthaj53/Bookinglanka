@@ -32,6 +32,11 @@ export const navItems = [
     ],
   },
   {
+    id: 81,
+    title: "Guides",
+    link: "/articles",
+  },
+  {
     id: 58,
     title: "Property",
     link: "/property",
