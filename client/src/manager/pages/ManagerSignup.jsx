@@ -124,66 +124,78 @@ export default function ManagerSignup() {
       heroImageAlt="Luxury hotel facade — hospitality manager and property frontage"
     >
       <div className="login-page__content">
-        <div className="login-page__top mb-4">
-          <h2 className="login-page__top__section-title">Create account</h2>
-          <p className="login-page__top__section-subtitle">Register to manage hotels and bookings</p>
-        </div>
-        <Form onSubmit={handleSignup}>
-          <div className="login-page__group">
-            <div className="login-page__input-box">
-              <i className="icon-email" />
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="login-page__input-box login-page__input-box--password">
-              <i className="icon-padlock" />
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
-                autoComplete="new-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <PasswordVisibilityToggle
-                visible={showPassword}
-                onToggle={() => setShowPassword((prev) => !prev)}
-              />
-            </div>
-            <div className="login-page__input-box login-page__input-box--password">
-              <i className="icon-padlock" />
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                placeholder="Confirm password"
-                autoComplete="new-password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
-              <PasswordVisibilityToggle
-                visible={showConfirmPassword}
-                onToggle={() => setShowConfirmPassword((prev) => !prev)}
-              />
-            </div>
-            <div className="login-page__input-box">
-              <button type="submit" className="gotur-btn w-100" disabled={loading}>
-                {loading ? "Creating…" : "Sign Up"}
-              </button>
+        <div className="login-page__main-tab-box tabs-box">
+          <div className="login-page__top">
+            <div className="login-page__top__left">
+              <h2 className="login-page__top__section-title">Welcome</h2>
+              <p className="login-page__top__section-subtitle">
+                Sign up to manage hotels and bookings
+              </p>
             </div>
           </div>
-        </Form>
-        <div className="login-page__divider" />
-        <p className="login-page__form__text text-center">
-          Already have an account?{" "}
-          <Link to="/manager/login" className="login-page__signup-link">
-            Log in
-          </Link>
-        </p>
+          <Form onSubmit={handleSignup}>
+            <div className="login-page__group">
+              <div className="login-page__input-box">
+                <i className="icon-email" />
+                <input
+                  type="text"
+                  placeholder="Enter your email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="login-page__input-box login-page__input-box--password">
+                <i className="icon-padlock" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Create a password"
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <PasswordVisibilityToggle
+                  visible={showPassword}
+                  onToggle={() => setShowPassword((prev) => !prev)}
+                />
+              </div>
+              <div className="login-page__input-box login-page__input-box--password">
+                <i className="icon-padlock" />
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm password"
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+                <PasswordVisibilityToggle
+                  visible={showConfirmPassword}
+                  onToggle={() => setShowConfirmPassword((prev) => !prev)}
+                />
+              </div>
+              <div className="login-page__input-box login-page__input-box--bottom">
+                <div className="login-page__input-box__inner">
+                  <input id="managerSignupTerms" type="checkbox" required />
+                  <label htmlFor="managerSignupTerms">I agree to the Terms & Conditions</label>
+                </div>
+              </div>
+              <div className="login-page__input-box">
+                <button type="submit" className="gotur-btn w-100" disabled={loading}>
+                  {loading ? "Signing up..." : "Sign Up"}
+                </button>
+              </div>
+            </div>
+          </Form>
+          <p className="login-page__form__text">
+            Already registered?{" "}
+            <Link to="/manager/login" className="login-page__signup-link">
+              Login
+            </Link>
+          </p>
+        </div>
       </div>
     </LoginPageLayout>
   );
