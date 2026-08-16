@@ -28,6 +28,25 @@ function mailFrom() {
   return named || (user ? `Booking Lanka <${user}>` : undefined)
 }
 
+function normalizeAddress(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+}
+
+/**
+ * Blind-copy staff inbox so we can see what travellers/managers received.
+ * Set EMAIL_BCC=off to disable. Defaults to EMAIL_USER (info@bookinglanka.com).
+ */
+function staffBcc(to) {
+  const raw = process.env.EMAIL_BCC
+  if (raw && /^(off|false|none|0)$/i.test(raw.trim())) return undefined
+  const bcc = (raw || emailUser()).trim()
+  if (!bcc) return undefined
+  if (normalizeAddress(bcc) === normalizeAddress(to)) return undefined
+  return bcc
+}
+
 function isEmailConfigured() {
   return Boolean(process.env.EMAIL_HOST && emailUser() && emailPass())
 }
@@ -99,15 +118,17 @@ export async function sendEmail({ to, subject, text, html, attachments }) {
       ]
     : []
 
+  const bcc = staffBcc(to)
   const info = await getTransporter().sendMail({
     from: mailFrom(),
     to,
+    bcc,
     subject,
     text,
     html,
     attachments: [...logoAttach, ...(attachments || [])],
   })
-  console.log(`📧 Email sent to ${to}: ${info.messageId}`)
+  console.log(`📧 Email sent to ${to}${bcc ? ` (bcc ${bcc})` : ''}: ${info.messageId}`)
   return info
 }
 
