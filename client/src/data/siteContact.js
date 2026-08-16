@@ -3,7 +3,7 @@
  */
 export const SITE_CONTACT = {
   email: "info@bookinglanka.com",
-  phone: "07145 55 002",
+  phone: "+94 7145 55 002",
   /** WhatsApp / tel digits with country code */
   phoneTel: "+94714555002",
   whatsappUrl: "https://wa.me/94714555002",
