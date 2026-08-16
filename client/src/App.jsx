@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import ScrollToTop from "./components/common/ScrollToTop";
 
 /* ================= USER PAGES ================= */
 import HotelsList from "./enduser/pages/HotelsList";
@@ -59,6 +60,7 @@ import AdminCommission from "./admin/pages/AdminCommission";
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
 
         {/* ========== PUBLIC USER ROUTES ========== */}

@@ -812,3 +812,34 @@ a.main-header__call:hover .main-header__call__number {
   background-size: cover;
   background-position: center center;
 }
+
+@media (max-width: 767px) {
+  .login-page__thumb {
+    max-height: 180px;
+    overflow: hidden;
+    border-radius: 16px;
+    margin-bottom: 8px;
+  }
+
+  .login-page__thumb img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 16px;
+    display: block;
+  }
+
+  .login-page__thumb::after {
+    display: none;
+  }
+
+  .login-page.section-space {
+    padding-top: 36px;
+    padding-bottom: 36px;
+  }
+
+  .login-page__content {
+    padding: 28px 18px;
+  }
+}
