@@ -4,6 +4,7 @@ import { generateBookingVoucherPdf } from './bookingVoucherPdf.js'
 import {
   appBaseUrl,
   bookingReference,
+  emailLogoPath,
   fmtDate,
   fmtMoney,
   wrapEmailHtml,
@@ -87,13 +88,24 @@ export function createEmailVerificationToken(user, portal = 'user') {
  * Send a generic email (HTML or plain text)
  */
 export async function sendEmail({ to, subject, text, html, attachments }) {
+  const logoFile = emailLogoPath()
+  const logoAttach = logoFile
+    ? [
+        {
+          filename: 'booking-lanka-logo.png',
+          path: logoFile,
+          cid: 'booking-lanka-logo',
+        },
+      ]
+    : []
+
   const info = await getTransporter().sendMail({
     from: mailFrom(),
     to,
     subject,
     text,
     html,
-    attachments,
+    attachments: [...logoAttach, ...(attachments || [])],
   })
   console.log(`📧 Email sent to ${to}: ${info.messageId}`)
   return info
@@ -104,10 +116,10 @@ export async function sendEmailVerificationEmail(userEmail, token, portal = 'use
   const portalLabel = portal === 'manager' ? 'hotel manager' : 'traveller'
   const loginPath = portal === 'manager' ? '/manager/login' : '/login'
 
-  const subject = 'Verify your Booking Lanka email'
+  const subject = 'No reply - email verification for registration'
   const html = wrapEmailHtml({
-    title: 'Confirm your email',
-    preheader: 'One quick step to activate your Booking Lanka account.',
+    title: 'Verify your email',
+    preheader: 'No reply - email verification for registration.',
     bodyHtml: `
       <p>Welcome to <strong>Booking Lanka</strong>!</p>
       <p>Please confirm your email address to activate your ${portalLabel} account and sign in securely.</p>
@@ -131,7 +143,7 @@ export async function sendBookingConfirmationEmail(userEmail, bookingDetails) {
   const ref = bookingReference(booking.id)
   const hotelName = booking.hotel?.name || 'Hotel'
   const roomName = booking.roomType?.name || 'Room'
-  const subject = `Booking confirmed — ${hotelName} (${ref})`
+  const subject = `No reply - hotel booking reference ${ref}`
 
   let pdfBuffer
   try {
@@ -181,7 +193,7 @@ export async function sendBookingConfirmationEmail(userEmail, bookingDetails) {
 
 export async function sendBookingCancellationEmail(userEmail, bookingDetails, reasonText) {
   const { id, hotel, checkIn, checkOut } = bookingDetails
-  const subject = `Booking cancelled — ${hotel?.name || 'Booking Lanka'}`
+  const subject = `No reply - hotel booking cancelled`
   const html = wrapEmailHtml({
     title: 'Booking cancelled',
     bodyHtml: `
@@ -200,10 +212,10 @@ export async function sendBookingCancellationEmail(userEmail, bookingDetails, re
 
 export async function sendPasswordResetEmail(userEmail, resetToken) {
   const resetUrl = `${appBaseUrl()}/reset-password?token=${encodeURIComponent(resetToken)}`
-  const subject = 'Reset your Booking Lanka password'
+  const subject = 'No reply - forgot password'
   const html = wrapEmailHtml({
     title: 'Reset your password',
-    preheader: 'Use this secure link to choose a new password.',
+    preheader: 'No reply - forgot password.',
     bodyHtml: `
       <p>We received a request to reset the password for <strong>${userEmail}</strong>.</p>
       <p>Click the button below to choose a new password. This link expires in <strong>30 minutes</strong>.</p>
