@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import apiClient from "../../services/apiClient";
 import "../../components/dashboard/dashboard-pages.css";
 import {
@@ -12,11 +11,8 @@ import {
 
 export default function ManagerPayoutAccount() {
   const { showFeedback } = useFeedback();
-  const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [connecting, setConnecting] = useState(false);
-  const [account, setAccount] = useState(null);
   const [form, setForm] = useState({
     provider: "bank",
     accountId: "",
@@ -28,9 +24,8 @@ export default function ManagerPayoutAccount() {
     setLoading(true);
     try {
       const { data } = await apiClient.get("/manager/payout-account");
-      setAccount(data);
       setForm({
-        provider: data.provider || "bank",
+        provider: "bank",
         accountId: data.accountId || "",
         bankName: data.bankName || "",
         accountHolder: data.accountHolder || "",
@@ -45,27 +40,6 @@ export default function ManagerPayoutAccount() {
 
   useEffect(() => {
     loadAccount();
-  }, []);
-
-  useEffect(() => {
-    const stripeFlag = searchParams.get("stripe");
-    if (!stripeFlag) return;
-
-    (async () => {
-      try {
-        await apiClient.post("/manager/payout-account/stripe/refresh");
-        await loadAccount();
-        if (stripeFlag === "return") {
-          feedbackSuccess(showFeedback, "Payout setup returned. Status refreshed.");
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        searchParams.delete("stripe");
-        setSearchParams(searchParams, { replace: true });
-      }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onChange = (e) => {
@@ -94,35 +68,6 @@ export default function ManagerPayoutAccount() {
     }
   };
 
-  const startStripeOnboard = async () => {
-    try {
-      setConnecting(true);
-      const { data } = await apiClient.post("/manager/payout-account/stripe/onboard");
-      if (data.url) {
-        window.location.href = data.url;
-        return;
-      }
-      feedbackWarning(showFeedback, "No onboarding URL returned");
-    } catch (err) {
-      feedbackError(showFeedback, apiErrorMessage(err, "Failed to start Stripe Connect"));
-    } finally {
-      setConnecting(false);
-    }
-  };
-
-  const refreshStripe = async () => {
-    try {
-      setConnecting(true);
-      const { data } = await apiClient.post("/manager/payout-account/stripe/refresh");
-      setAccount(data.account);
-      feedbackSuccess(showFeedback, data.message || "Payout status updated");
-    } catch (err) {
-      feedbackError(showFeedback, apiErrorMessage(err, "Failed to refresh Stripe status"));
-    } finally {
-      setConnecting(false);
-    }
-  };
-
   if (loading) return <p className="text-muted mb-0">Loading…</p>;
 
   return (
@@ -131,56 +76,11 @@ export default function ManagerPayoutAccount() {
         Payout Account
       </h2>
 
-      <div className="dashboard-card" style={{ marginBottom: "1.25rem" }}>
-        <div className="dashboard-card__body">
-          <h3 style={{ marginTop: 0, fontSize: "1.05rem" }}>Receive card payments</h3>
-          <p style={{ color: "#374151" }}>
-            When a guest pays by card on Booking Lanka, the stay amount is sent to your hotel after
-            the platform commission (default 15%, or the rate set for your hotel).
-          </p>
-          <p style={{ fontSize: "0.9rem", color: "#6c757d" }}>
-            Status:{" "}
-            <strong>
-              {account?.provider === "stripe" ? account?.status : "Not set up"}
-            </strong>
-            {account?.stripeReady
-              ? " · Ready to receive card payouts"
-              : " · Complete a short secure verification so card payouts can reach your account"}
-            {account?.maskedAccountId && account?.provider === "stripe"
-              ? ` · ${account.maskedAccountId}`
-              : ""}
-          </p>
-          <p style={{ fontSize: "0.85rem", color: "#6c757d" }}>
-            Verification is required by the card networks. You fill it once; guests never leave Booking
-            Lanka to pay.
-          </p>
-          <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-            <button
-              type="button"
-              className="gotur-btn gotur-btn--base"
-              onClick={startStripeOnboard}
-              disabled={connecting}
-            >
-              {connecting ? "Opening…" : account?.stripeReady ? "Update payout details" : "Set up card payouts"}
-            </button>
-            <button
-              type="button"
-              className="btn btn-outline-secondary"
-              onClick={refreshStripe}
-              disabled={connecting}
-            >
-              Refresh status
-            </button>
-          </div>
-        </div>
-      </div>
-
       <div className="dashboard-card">
         <div className="dashboard-card__body">
           <h3 style={{ marginTop: 0, fontSize: "1.05rem" }}>Bank details</h3>
           <p style={{ fontSize: "0.9rem", color: "#6c757d", marginBottom: "1rem" }}>
-            Save your bank account for records and payouts. Card charges from guests still use the
-            secure payout setup above.
+            Save the bank account where Booking Lanka should send your hotel payouts.
           </p>
 
           <form onSubmit={onSaveBank}>
