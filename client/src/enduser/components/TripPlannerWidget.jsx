@@ -18,6 +18,14 @@ const INTERESTS = [
  * When authenticatedPlanner is true, trip-plan and availability calls use apiClient (Bearer),
  * for use inside the logged-in user dashboard.
  */
+function defaultStartOnFirst() {
+  const now = new Date();
+  const nextMonth = now.getDate() === 1 ? now : new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const y = nextMonth.getFullYear();
+  const m = String(nextMonth.getMonth() + 1).padStart(2, "0");
+  return `${y}-${m}-01`;
+}
+
 export default function TripPlannerWidget({ compact = false, authenticatedPlanner = false }) {
   const navigate = useNavigate();
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
@@ -27,9 +35,7 @@ export default function TripPlannerWidget({ compact = false, authenticatedPlanne
   const [locationQuery, setLocationQuery] = useState("Sri Lanka");
   const [activityType, setActivityType] = useState("Adventure");
   const [travelers, setTravelers] = useState(2);
-  const [plannerStartDate, setPlannerStartDate] = useState(
-    new Date().toISOString().slice(0, 10)
-  );
+  const [plannerStartDate, setPlannerStartDate] = useState(defaultStartOnFirst);
   const [budget, setBudget] = useState("mid");
   const [travelStyle, setTravelStyle] = useState("couple");
   const [interests, setInterests] = useState(["culture", "beach"]);
@@ -47,6 +53,7 @@ export default function TripPlannerWidget({ compact = false, authenticatedPlanne
   const [availableHotels, setAvailableHotels] = useState([]);
   const [unavailableHotels, setUnavailableHotels] = useState([]);
   const [checkingAvailability, setCheckingAvailability] = useState(false);
+  const [stopOrder, setStopOrder] = useState([]);
 
   const cardStyle = useMemo(
     () => ({
@@ -121,7 +128,81 @@ export default function TripPlannerWidget({ compact = false, authenticatedPlanne
   const hotelsForBooking = availableHotels.length ? availableHotels : hotels;
 
   useEffect(() => {
-    if (!itinerary.length) return undefined;
+    if (!result?.itinerary?.length) {
+      setStopOrder([]);
+      return;
+    }
+    const seen = [];
+    result.itinerary.forEach((item) => {
+      const key = item.destinationSlug || String(item.destinationName || "").toLowerCase();
+      if (!seen.some((s) => s.key === key)) {
+        seen.push({
+          key,
+          destinationSlug: item.destinationSlug,
+          destinationName: item.destinationName,
+          skipped: false,
+        });
+      }
+    });
+    setStopOrder(seen);
+  }, [result]);
+
+  const displayItinerary = useMemo(() => {
+    if (!stopOrder.length || !itinerary.length) return itinerary;
+    const active = stopOrder.filter((s) => !s.skipped);
+    if (!active.length) return itinerary;
+    const daysSafe = Math.max(2, itinerary.length);
+    const blocks = active.length;
+    const base = Math.floor(daysSafe / blocks);
+    let extra = daysSafe % blocks;
+    let dayNo = 1;
+    const next = [];
+    for (const stop of active) {
+      const stay = base + (extra > 0 ? 1 : 0);
+      if (extra > 0) extra -= 1;
+      for (let i = 0; i < stay; i += 1) {
+        next.push({
+          day: dayNo,
+          destinationSlug: stop.destinationSlug,
+          destinationName: stop.destinationName,
+          plan:
+            i === 0
+              ? `Arrive in ${stop.destinationName}, explore key attractions and local food.`
+              : `Continue in ${stop.destinationName} with sightseeing and local experiences.`,
+        });
+        dayNo += 1;
+      }
+    }
+    return next;
+  }, [stopOrder, itinerary]);
+
+  const hotelsForAdjustedPlan = useMemo(() => {
+    const activeKeys = new Set(stopOrder.filter((s) => !s.skipped).map((s) => s.key));
+    if (!activeKeys.size) return hotelsForBooking;
+    return hotelsForBooking.filter((h) => {
+      const key =
+        h.destinationSlug ||
+        String(h.destinationName || "").toLowerCase() ||
+        String(h.destination || "").toLowerCase();
+      return activeKeys.has(key);
+    });
+  }, [stopOrder, hotelsForBooking]);
+
+  const mapForDisplay = useMemo(() => {
+    if (!result?.map?.stops || !stopOrder.length) return result?.map;
+    const activeNames = new Set(
+      stopOrder.filter((s) => !s.skipped).map((s) => String(s.destinationName || "").toLowerCase())
+    );
+    const stops = result.map.stops.filter((s) => {
+      if (s.type === "airport") return true;
+      const label = String(s.label || "").toLowerCase();
+      return [...activeNames].some((n) => n && label.includes(n));
+    });
+    return { ...result.map, stops };
+  }, [result, stopOrder]);
+
+  useEffect(() => {
+    if (!displayItinerary.length) return undefined;
     let dayIdx = 0;
     let charIdx = 0;
     let current = "";
@@ -132,7 +213,7 @@ export default function TripPlannerWidget({ compact = false, authenticatedPlanne
 
     const timer = setInterval(() => {
       if (!mounted) return;
-      const item = itinerary[dayIdx];
+      const item = displayItinerary[dayIdx];
       if (!item) {
         setTypingDone(true);
         clearInterval(timer);
@@ -156,7 +237,7 @@ export default function TripPlannerWidget({ compact = false, authenticatedPlanne
       mounted = false;
       clearInterval(timer);
     };
-  }, [result]);
+  }, [displayItinerary]);
 
   const resolveImage = (url) => {
     if (!url) return "https://placehold.co/120x80?text=Hotel";
@@ -167,16 +248,16 @@ export default function TripPlannerWidget({ compact = false, authenticatedPlanne
 
   const dayDurations = useMemo(() => {
     const map = new Map();
-    itinerary.forEach((i) => {
+    displayItinerary.forEach((i) => {
       const key = i.destinationSlug || String(i.destinationName || "").toLowerCase();
       map.set(key, (map.get(key) || 0) + 1);
     });
     return map;
-  }, [itinerary]);
+  }, [displayItinerary]);
 
   const hotelByDestination = useMemo(() => {
     const map = new Map();
-    hotelsForBooking.forEach((h) => {
+    hotelsForAdjustedPlan.forEach((h) => {
       const key =
         h.destinationSlug ||
         String(h.destinationName || "").toLowerCase() ||
@@ -184,7 +265,7 @@ export default function TripPlannerWidget({ compact = false, authenticatedPlanne
       if (!map.has(key)) map.set(key, h);
     });
     return map;
-  }, [hotelsForBooking]);
+  }, [hotelsForAdjustedPlan]);
 
   const estimatedTotal = useMemo(() => {
     let total = 0;
@@ -199,7 +280,7 @@ export default function TripPlannerWidget({ compact = false, authenticatedPlanne
   const buildSegments = () => {
     const seq = [];
     let current = null;
-    itinerary.forEach((item) => {
+    displayItinerary.forEach((item) => {
       const key = item.destinationSlug || String(item.destinationName || "").toLowerCase();
       if (!current || current.key !== key) {
         current = { key, destinationName: item.destinationName, nights: 1 };
@@ -222,7 +303,7 @@ export default function TripPlannerWidget({ compact = false, authenticatedPlanne
         setCheckingAvailability(true);
         const payload = {
           startDate: tripStartDate,
-          itinerary: result.itinerary,
+          itinerary: displayItinerary.length ? displayItinerary : result.itinerary,
           recommendedHotels: result.recommendedHotels,
         };
         let data;
@@ -322,27 +403,7 @@ export default function TripPlannerWidget({ compact = false, authenticatedPlanne
     <div style={cardStyle}>
       {!compact ? (
         <div>
-          <div
-            style={{
-              borderRadius: 999,
-              padding: "18px 20px",
-              background: "#fff",
-              boxShadow: "0 8px 24px rgba(0,0,0,.06)",
-              display: "grid",
-              gridTemplateColumns: "1.1fr 1fr 1fr .8fr auto",
-              gap: 12,
-              alignItems: "center",
-            }}
-          >
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 700 }}>Location</div>
-              <input
-                className="form-control"
-                value={locationQuery}
-                onChange={(e) => setLocationQuery(e.target.value)}
-                style={{ border: "none", padding: "6px 0", fontSize: 22, fontWeight: 600 }}
-              />
-            </div>
+          <div className="trip-planner-bar">
             <div>
               <div style={{ fontSize: 13, fontWeight: 700 }}>Activities Type</div>
               <select
@@ -395,15 +456,30 @@ export default function TripPlannerWidget({ compact = false, authenticatedPlanne
           </div>
           <div className="row g-2" style={{ marginTop: 10 }}>
             <div className="col-sm-4">
-              <input
-                type="number"
-                min={2}
-                max={30}
-                value={days}
-                onChange={(e) => setDays(Number(e.target.value) || 10)}
-                className="form-control"
-                placeholder="Days"
-              />
+              <label style={{ fontSize: 12, fontWeight: 700 }}>Days</label>
+              <div className="trip-days-stepper">
+                <button
+                  type="button"
+                  aria-label="Fewer days"
+                  onClick={() => setDays((d) => Math.max(2, Number(d) - 1))}
+                >
+                  −
+                </button>
+                <input
+                  type="number"
+                  min={2}
+                  max={30}
+                  value={days}
+                  onChange={(e) => setDays(Math.max(2, Math.min(30, Number(e.target.value) || 2)))}
+                />
+                <button
+                  type="button"
+                  aria-label="More days"
+                  onClick={() => setDays((d) => Math.min(30, Number(d) + 1))}
+                >
+                  +
+                </button>
+              </div>
             </div>
             <div className="col-sm-4">
               <select
@@ -438,15 +514,30 @@ export default function TripPlannerWidget({ compact = false, authenticatedPlanne
           </p>
           <div className="row g-2">
             <div className="col-sm-4">
-              <input
-                type="number"
-                min={2}
-                max={30}
-                value={days}
-                onChange={(e) => setDays(Number(e.target.value) || 10)}
-                className="form-control"
-                placeholder="Days"
-              />
+              <label style={{ fontSize: 12, fontWeight: 700 }}>Days</label>
+              <div className="trip-days-stepper">
+                <button
+                  type="button"
+                  aria-label="Fewer days"
+                  onClick={() => setDays((d) => Math.max(2, Number(d) - 1))}
+                >
+                  −
+                </button>
+                <input
+                  type="number"
+                  min={2}
+                  max={30}
+                  value={days}
+                  onChange={(e) => setDays(Math.max(2, Math.min(30, Number(e.target.value) || 2)))}
+                />
+                <button
+                  type="button"
+                  aria-label="More days"
+                  onClick={() => setDays((d) => Math.min(30, Number(d) + 1))}
+                >
+                  +
+                </button>
+              </div>
             </div>
             <div className="col-sm-4">
               <select className="form-control" value={budget} onChange={(e) => setBudget(e.target.value)}>
@@ -511,7 +602,68 @@ export default function TripPlannerWidget({ compact = false, authenticatedPlanne
           </p>
           <div className="row g-3">
             <div className={compact ? "col-12" : "col-lg-8"}>
-              {itinerary.slice(0, compact ? Math.min(visibleCount, 4) : visibleCount).map((item) => {
+              {!compact && stopOrder.length > 0 && (
+                <div style={{ border: "1px solid #ececec", borderRadius: 10, padding: 10, marginBottom: 10 }}>
+                  <div style={{ fontWeight: 700, marginBottom: 8 }}>Adjust places (optional)</div>
+                  <p style={{ fontSize: 12, color: "#6b7280", marginBottom: 8 }}>
+                    Skip a stop or move it with the arrows. Hotels update to match the remaining route.
+                  </p>
+                  {stopOrder.map((stop, index) => (
+                    <div
+                      key={stop.key}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        marginBottom: 6,
+                        opacity: stop.skipped ? 0.45 : 1,
+                      }}
+                    >
+                      <span style={{ flex: 1, fontWeight: 600 }}>{stop.destinationName}</span>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-secondary"
+                        disabled={index === 0}
+                        onClick={() =>
+                          setStopOrder((prev) => {
+                            const next = [...prev];
+                            [next[index - 1], next[index]] = [next[index], next[index - 1]];
+                            return next;
+                          })
+                        }
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-secondary"
+                        disabled={index === stopOrder.length - 1}
+                        onClick={() =>
+                          setStopOrder((prev) => {
+                            const next = [...prev];
+                            [next[index + 1], next[index]] = [next[index], next[index + 1]];
+                            return next;
+                          })
+                        }
+                      >
+                        ↓
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-secondary"
+                        onClick={() =>
+                          setStopOrder((prev) =>
+                            prev.map((s, i) => (i === index ? { ...s, skipped: !s.skipped } : s))
+                          )
+                        }
+                      >
+                        {stop.skipped ? "Include" : "Skip"}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {displayItinerary.slice(0, compact ? Math.min(visibleCount, 4) : visibleCount).map((item) => {
                 const isOpen = openDay === item.day;
                 return (
                   <div
@@ -559,7 +711,7 @@ export default function TripPlannerWidget({ compact = false, authenticatedPlanne
               <div className="col-lg-4">
                 <div style={{ border: "1px solid #ececec", borderRadius: 10, padding: 10 }}>
                   <h6 style={{ marginBottom: 10 }}>Suggested Hotels</h6>
-                  {(hotelsForBooking.length ? hotelsForBooking : hotels).slice(0, 6).map((hotel) => (
+                  {(hotelsForAdjustedPlan.length ? hotelsForAdjustedPlan : hotels).slice(0, 6).map((hotel) => (
                     <Link
                       key={hotel.id}
                       to={hotelDetailPath(hotel.id)}
@@ -638,7 +790,7 @@ export default function TripPlannerWidget({ compact = false, authenticatedPlanne
             </div>
           )}
 
-          {!compact && result?.map && <TripRouteMap mapData={result.map} />}
+          {!compact && mapForDisplay && <TripRouteMap mapData={mapForDisplay} />}
         </div>
       )}
     </div>

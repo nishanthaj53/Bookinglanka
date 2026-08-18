@@ -56,7 +56,7 @@ export default function ManagerPayoutAccount() {
         await apiClient.post("/manager/payout-account/stripe/refresh");
         await loadAccount();
         if (stripeFlag === "return") {
-          feedbackSuccess(showFeedback, "Stripe onboarding returned. Status refreshed.");
+          feedbackSuccess(showFeedback, "Payout setup returned. Status refreshed.");
         }
       } catch (err) {
         console.error(err);
@@ -115,7 +115,7 @@ export default function ManagerPayoutAccount() {
       setConnecting(true);
       const { data } = await apiClient.post("/manager/payout-account/stripe/refresh");
       setAccount(data.account);
-      feedbackSuccess(showFeedback, data.message || "Stripe status updated");
+      feedbackSuccess(showFeedback, data.message || "Payout status updated");
     } catch (err) {
       feedbackError(showFeedback, apiErrorMessage(err, "Failed to refresh Stripe status"));
     } finally {
@@ -133,20 +133,26 @@ export default function ManagerPayoutAccount() {
 
       <div className="dashboard-card" style={{ marginBottom: "1.25rem" }}>
         <div className="dashboard-card__body">
-          <h3 style={{ marginTop: 0, fontSize: "1.05rem" }}>Stripe Connect (required for card payments)</h3>
+          <h3 style={{ marginTop: 0, fontSize: "1.05rem" }}>Receive card payments</h3>
           <p style={{ color: "#374151" }}>
-            Guests pay by card on Booking Lanka. Your hotel receives the booking amount minus the
-            admin commission (default 15%, or the rate set for your hotel).
+            When a guest pays by card on Booking Lanka, the stay amount is sent to your hotel after
+            the platform commission (default 15%, or the rate set for your hotel).
           </p>
           <p style={{ fontSize: "0.9rem", color: "#6c757d" }}>
             Status:{" "}
             <strong>
-              {account?.provider === "stripe" ? account?.status : "Not linked"}
+              {account?.provider === "stripe" ? account?.status : "Not set up"}
             </strong>
-            {account?.stripeReady ? " · Ready to receive payouts" : " · Complete onboarding to receive card payments"}
+            {account?.stripeReady
+              ? " · Ready to receive card payouts"
+              : " · Complete a short secure verification so card payouts can reach your account"}
             {account?.maskedAccountId && account?.provider === "stripe"
               ? ` · ${account.maskedAccountId}`
               : ""}
+          </p>
+          <p style={{ fontSize: "0.85rem", color: "#6c757d" }}>
+            Verification is required by the card networks. You fill it once; guests never leave Booking
+            Lanka to pay.
           </p>
           <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
             <button
@@ -155,7 +161,7 @@ export default function ManagerPayoutAccount() {
               onClick={startStripeOnboard}
               disabled={connecting}
             >
-              {connecting ? "Opening Stripe…" : account?.stripeReady ? "Update Stripe account" : "Connect with Stripe"}
+              {connecting ? "Opening…" : account?.stripeReady ? "Update payout details" : "Set up card payouts"}
             </button>
             <button
               type="button"
@@ -171,9 +177,10 @@ export default function ManagerPayoutAccount() {
 
       <div className="dashboard-card">
         <div className="dashboard-card__body">
-          <h3 style={{ marginTop: 0, fontSize: "1.05rem" }}>Bank details (optional backup)</h3>
+          <h3 style={{ marginTop: 0, fontSize: "1.05rem" }}>Bank details</h3>
           <p style={{ fontSize: "0.9rem", color: "#6c757d", marginBottom: "1rem" }}>
-            Optional record for admin. Card splitting uses Stripe Connect above.
+            Save your bank account for records and payouts. Card charges from guests still use the
+            secure payout setup above.
           </p>
 
           <form onSubmit={onSaveBank}>

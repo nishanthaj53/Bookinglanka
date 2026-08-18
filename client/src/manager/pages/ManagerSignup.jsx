@@ -12,6 +12,7 @@ export default function ManagerSignup() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState("");
   const [resendLoading, setResendLoading] = useState(false);
@@ -20,6 +21,11 @@ export default function ManagerSignup() {
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    if (!acceptedTerms) {
+      window.alert("Please accept the Terms & Conditions before creating an account.");
+      feedbackWarning(showFeedback, "Please accept the Terms & Conditions to continue.");
+      return;
+    }
     if (password !== confirmPassword) {
       feedbackWarning(showFeedback, "Password and confirm password must match.");
       return;
@@ -178,8 +184,18 @@ export default function ManagerSignup() {
               </div>
               <div className="login-page__input-box login-page__input-box--bottom">
                 <div className="login-page__input-box__inner">
-                  <input id="managerSignupTerms" type="checkbox" required />
-                  <label htmlFor="managerSignupTerms">I agree to the Terms & Conditions</label>
+                  <input
+                    id="managerSignupTerms"
+                    type="checkbox"
+                    checked={acceptedTerms}
+                    onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  />
+                  <label htmlFor="managerSignupTerms">
+                    I agree to the{" "}
+                    <Link to="/terms" target="_blank" rel="noreferrer">
+                      Terms &amp; Conditions
+                    </Link>
+                  </label>
                 </div>
               </div>
               <div className="login-page__input-box">

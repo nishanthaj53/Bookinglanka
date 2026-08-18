@@ -6,7 +6,7 @@ import path from "path";
 import { env } from "./env.js";
 
 /** Per-file limit for hotel / room / amenity images */
-export const MAX_IMAGE_UPLOAD_BYTES = 15 * 1024 * 1024;
+export const MAX_IMAGE_UPLOAD_BYTES = 50 * 1024 * 1024;
 export const MAX_IMAGE_UPLOAD_MB = Math.round(MAX_IMAGE_UPLOAD_BYTES / (1024 * 1024));
 
 const s3 = new AWS.S3({
@@ -65,7 +65,7 @@ export const upload = multer({
       return;
     }
     const err = new Error(
-      `Only image files are allowed (max ${MAX_IMAGE_UPLOAD_MB}MB each). SVG is not supported for security.`
+      `Only image files are allowed. SVG is not supported for security.`
     );
     err.code = "INVALID_IMAGE_UPLOAD";
     cb(err);

@@ -28,6 +28,7 @@ import PropertyPage from "./enduser/pages/PropertyPage";
 import PropertyDetailsPage from "./enduser/pages/PropertyDetailsPage";
 import ArticlesPage from "./enduser/pages/ArticlesPage";
 import ArticleDetailsPage from "./enduser/pages/ArticleDetailsPage";
+import TermsPage from "./enduser/pages/TermsPage";
 import AiPlannerPage from "./enduser/pages/AiPlannerPage";
 // import Hoteldetailui from "./enduser/pages/HotelDetailUiPage";  
 
@@ -76,6 +77,7 @@ export default function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/account" element={<AccountEntry />} />
         <Route path="/signup" element={<SignupDesign />} />
+        <Route path="/terms" element={<TermsPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/verify-email" element={<VerifyEmailPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />

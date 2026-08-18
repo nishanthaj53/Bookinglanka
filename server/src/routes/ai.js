@@ -11,12 +11,25 @@ const DEFAULT_AIRPORT = {
   lon: 79.8841,
 };
 
-function pickTopByInterest(destinations, interests) {
+const SL_COORDS = {
+  jaffna: { lat: 9.6615, lon: 80.0255 },
+  kandy: { lat: 7.2906, lon: 80.6337 },
+  ella: { lat: 6.8667, lon: 81.0466 },
+  galle: { lat: 6.0329, lon: 80.217 },
+  sigiriya: { lat: 7.957, lon: 80.7603 },
+  "arugam-bay": { lat: 6.8404, lon: 81.836 },
+  colombo: { lat: 6.9271, lon: 79.8612 },
+  trincomalee: { lat: 8.5874, lon: 81.2152 },
+  "nuwara-eliya": { lat: 6.9497, lon: 80.7891 },
+};
+
+const ISLAND_SPREAD = ["sigiriya", "kandy", "ella", "galle", "arugam-bay", "jaffna", "trincomalee"];
+
+function pickTopByInterest(destinations, interests, days = 10) {
   if (!Array.isArray(destinations) || destinations.length === 0) return [];
   const normalizedInterests = (interests || []).map((i) => String(i).toLowerCase().trim()).filter(Boolean);
-  if (!normalizedInterests.length) return destinations.slice(0, 4);
 
-  return [...destinations]
+  const scored = [...destinations]
     .map((d) => {
       const hay = `${d.name || ""} ${d.bestFor || ""} ${d.overview || ""} ${d.whyVisit || ""}`.toLowerCase();
       const score = normalizedInterests.reduce(
@@ -25,8 +38,29 @@ function pickTopByInterest(destinations, interests) {
       );
       return { ...d, _score: score };
     })
-    .sort((a, b) => b._score - a._score || (a.sortOrder || 0) - (b.sortOrder || 0))
-    .slice(0, 4);
+    .sort((a, b) => b._score - a._score || (a.sortOrder || 0) - (b.sortOrder || 0));
+
+  const picked = [];
+  const used = new Set();
+  for (const d of scored) {
+    if (picked.length >= 5) break;
+    picked.push(d);
+    used.add(d.slug);
+  }
+  const bySlug = new Map(destinations.map((d) => [d.slug, d]));
+  if (Number(days) >= 7 && bySlug.get("jaffna") && !used.has("jaffna")) {
+    picked.push(bySlug.get("jaffna"));
+    used.add("jaffna");
+  }
+  for (const slug of ISLAND_SPREAD) {
+    if (picked.length >= 6) break;
+    const d = bySlug.get(slug);
+    if (d && !used.has(slug)) {
+      picked.push(d);
+      used.add(slug);
+    }
+  }
+  return picked.length ? picked : destinations.slice(0, 4);
 }
 
 function mapHotelCard(h) {
@@ -44,7 +78,11 @@ function mapHotelCard(h) {
   };
 }
 
-async function geocodeSriLankaLocation(query) {
+async function geocodeSriLankaLocation(query, slug) {
+  const slugKey = String(slug || "").trim().toLowerCase();
+  if (slugKey && SL_COORDS[slugKey]) return SL_COORDS[slugKey];
+  const nameKey = String(query || "").trim().toLowerCase();
+  if (nameKey && SL_COORDS[nameKey]) return SL_COORDS[nameKey];
   const key = String(query || "").trim().toLowerCase();
   if (!key) return null;
   if (geocodeCache.has(key)) return geocodeCache.get(key);
@@ -108,7 +146,7 @@ async function buildRouteMap(itinerary, destinations) {
     const stop = stops[i];
     const d = destinationBySlug.get(stop.slug);
     const query = d?.town || d?.district || d?.name || stop.name;
-    const point = await geocodeSriLankaLocation(query);
+    const point = await geocodeSriLankaLocation(query, stop.slug);
     if (!point) continue;
     stop.lat = point.lat;
     stop.lon = point.lon;
@@ -339,7 +377,7 @@ router.post("/trip-plan", async (req, res) => {
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
     });
 
-    const picked = pickTopByInterest(destinations, interests);
+    const picked = pickTopByInterest(destinations, interests, days);
     const hotelsBySlug = {};
     for (const d of picked) {
       const terms = [d.town, d.district].map((x) => String(x || "").trim()).filter(Boolean);

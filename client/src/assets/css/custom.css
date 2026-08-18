@@ -1112,7 +1112,102 @@ a.main-header__call:hover .main-header__call__number {
   line-height: 1.35;
 }
 
+.login-page__input-box__inner label::before {
+  border: 1.5px solid #1d231f !important;
+  background-color: #fff !important;
+}
+
+.login-page__input-box__inner input[type="checkbox"]:checked + label::before {
+  border-color: #f7921e !important;
+}
+
+.login-page__input-box__inner input[type="checkbox"]:checked + label::after {
+  background-color: #f7921e !important;
+  opacity: 1 !important;
+}
+
+.login-page__input-box__inner label a {
+  color: #f7921e;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.trip-planner-bar {
+  border-radius: 999px;
+  padding: 18px 20px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  display: grid;
+  grid-template-columns: 1fr 1fr 0.8fr auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.trip-days-stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 6px 8px;
+  background: #fff;
+}
+
+.trip-days-stepper button {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #1d231f;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.trip-days-stepper input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  background: transparent;
+}
+
+@media (max-width: 991px) {
+  .trip-planner-bar {
+    border-radius: 16px;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .trip-planner-bar .gotur-btn {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
+
 @media (max-width: 767px) {
+  .trip-planner-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-page,
+  .dashboard-card {
+    max-width: 100%;
+  }
+
+  .dashboard-card__body {
+    padding: 0.9rem;
+    overflow-x: auto;
+  }
+
+  .tour-listing-details__destination__title,
+  .tour-listing-details__destination__posted-text {
+    font-size: 1rem;
+  }
+
   .article-story__hero {
     min-height: 420px;
   }

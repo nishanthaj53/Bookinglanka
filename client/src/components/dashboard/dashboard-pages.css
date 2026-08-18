@@ -103,6 +103,9 @@
   background: #f8f9fa;
 }
 @media (max-width: 768px) {
+  .dashboard-page {
+    padding: 0 2px;
+  }
   .dashboard-table-wrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;

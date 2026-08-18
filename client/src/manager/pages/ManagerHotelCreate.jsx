@@ -40,6 +40,7 @@ export default function ManagerHotelCreate() {
 
   const [form, setForm] = useState({
     name: "",
+    city: "",
     address: "",
     latitude: "",
     longitude: "",
@@ -116,6 +117,7 @@ export default function ManagerHotelCreate() {
     const embed = buildMapEmbedFromLatLng(latStr, lonStr);
     setForm((prev) => ({
       ...prev,
+      city: prev.city || String(p.display_name || "").split(",")[0] || prev.city,
       address: p.display_name || prev.address,
       latitude: latStr,
       longitude: lonStr,
@@ -199,12 +201,17 @@ export default function ManagerHotelCreate() {
 
   const handleAddHotel = async (e) => {
     e.preventDefault();
+    const resolvedAddress = (form.address || form.city || "").trim();
     if (!form.name?.trim()) {
       feedbackWarning(showFeedback, "Hotel name is required.");
       return;
     }
-    if (!form.address?.trim()) {
-      feedbackWarning(showFeedback, "Address is required.");
+    if (!form.city?.trim()) {
+      feedbackWarning(showFeedback, "Please enter the situated city.");
+      return;
+    }
+    if (!resolvedAddress) {
+      feedbackWarning(showFeedback, "Please set the hotel location on the map below (or keep the city as the address).");
       return;
     }
     if (!cover?.file) {
@@ -236,7 +243,7 @@ export default function ManagerHotelCreate() {
     try {
       setLoading(true);
       const formData = new FormData();
-      let merged = { ...form, description: form.description || form.overview || "" };
+      let merged = { ...form, address: resolvedAddress, description: form.description || form.overview || "" };
       const la = parseFloat(merged.latitude);
       const lo = parseFloat(merged.longitude);
       if (!Number.isNaN(la) && !Number.isNaN(lo)) {
@@ -307,8 +314,8 @@ export default function ManagerHotelCreate() {
   return (
     <form onSubmit={handleAddHotel} style={{ maxWidth: "100%" }}>
       <p className="text-muted small mb-3" style={{ marginTop: "-0.5rem" }}>
-        Build your hotel the same way guests will see it. Recommended sizes — cover <strong>1920×460</strong>, relevant photos{" "}
-        <strong>584×395</strong>, amenities strip <strong>370×243</strong>, room cards <strong>370×243</strong> (room photos after save).
+        Phone photos are welcome. Image size is optional — we only recommend cover around{" "}
+        <strong>1920×460</strong> and gallery around <strong>584×395</strong> if you want a sharper listing.
       </p>
 
       <section className="tour-listing-details section-space" style={{ paddingTop: 0 }}>
@@ -341,11 +348,11 @@ export default function ManagerHotelCreate() {
                   <div className="tour-listing-details__destination__posted">
                     <i className="icon-pin1"></i>
                     <input
-                      name="address"
-                      value={form.address}
+                      name="city"
+                      value={form.city}
                       onChange={handleChange}
                       className="tour-listing-details__destination__posted-text"
-                      placeholder="Address (required)"
+                      placeholder="Situated city (e.g. Jaffna, Galle)"
                       required
                       style={{
                         border: "none",
@@ -403,7 +410,7 @@ export default function ManagerHotelCreate() {
                 >
                   <span style={{ fontSize: "2.5rem", lineHeight: 1 }}>+</span>
                   <span style={{ fontSize: "1rem", fontWeight: 600 }}>Add cover image</span>
-                  <span className="small">1920 × 460 recommended</span>
+                  <span className="small">Any size accepted · 1920 × 460 looks best</span>
                 </button>
               )}
               <input ref={coverInputRef} type="file" accept="image/*" hidden onChange={onCoverChange} />
@@ -415,7 +422,7 @@ export default function ManagerHotelCreate() {
           <div className="container-fluid">
             <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
               <h4 className="tour-listing-details__title mb-0">Relevant Hotel Photos</h4>
-              <span className="small text-muted">At least one required · 584×395 recommended</span>
+              <span className="small text-muted">At least one required · any size accepted</span>
             </div>
             <div style={{ display: "flex", gap: "12px", overflowX: "auto", paddingBottom: "8px" }}>
               {gallery.map((item, index) => (
@@ -454,7 +461,7 @@ export default function ManagerHotelCreate() {
                 <div className="tour-listing-details__info-area__content">
                   <h5 className="tour-listing-details__info-area__title">Situated Place</h5>
                   <p className="tour-listing-details__info-area__text" style={{ marginBottom: 0 }}>
-                    {form.address?.trim() || "Enter address above"}
+                    {form.city?.trim() || form.address?.trim() || "Enter city above"}
                   </p>
                 </div>
               </li>
@@ -713,9 +720,9 @@ export default function ManagerHotelCreate() {
                 </div>
 
                 <div className="tour-listing-details__content__item wow fadeInUp">
-                  <h4 className="tour-listing-details__title">Location preview</h4>
+                  <h4 className="tour-listing-details__title">Hotel address &amp; map</h4>
                   <p className="small text-muted mb-2">
-                    Search for a city or street below the map, pick the correct result, and we fill <strong>address</strong>, <strong>latitude</strong>, <strong>longitude</strong>, and the <strong>embed URL</strong>. You can still edit coordinates manually.
+                    After photos, search the map and pick the pin. We save the full address from the map so guests can find you. City is already set above.
                   </p>
                   <div className="row g-2 mb-2">
                     <div className="col-md-6">
@@ -768,7 +775,7 @@ export default function ManagerHotelCreate() {
                           runGeocode();
                         }
                       }}
-                      placeholder="e.g. Colombo Fort, Galle Face, Ella Sri Lanka"
+                      placeholder="e.g. Nallur, Jaffna Fort, Galle Fort"
                       style={{ flex: "1 1 200px", border: "1px solid #e9ecef", borderRadius: "8px", padding: "0.5rem 0.75rem" }}
                     />
                     <button type="button" className="gotur-btn" style={{ whiteSpace: "nowrap" }} onClick={runGeocode} disabled={geocodeLoading}>
@@ -801,7 +808,7 @@ export default function ManagerHotelCreate() {
                   )}
                 </div>
 
-                <div className="tour-listing-details__content__item wow fadeInUp d-lg-none">
+                <div className="tour-listing-details__content__item wow fadeInUp">
                   <button type="submit" className="gotur-btn w-100" disabled={loading}>
                     {loading ? "Saving…" : "Submit hotel"}
                   </button>
@@ -816,12 +823,13 @@ export default function ManagerHotelCreate() {
                   <p className="small text-muted mb-3">Required before submit:</p>
                   <ul className="small mb-3 ps-3">
                     <li>Hotel name</li>
-                    <li>Address</li>
+                    <li>Situated city</li>
                     <li>Cover image</li>
                     <li>At least one relevant photo</li>
+                    <li>Map address (search below photos)</li>
                     <li>If you add rooms: each needs price (and name &amp; capacity)</li>
                   </ul>
-                  <button type="submit" className="gotur-btn w-100 d-none d-lg-block" disabled={loading}>
+                  <button type="submit" className="gotur-btn w-100" disabled={loading}>
                     {loading ? "Saving…" : "Submit hotel"}
                   </button>
                 </div>

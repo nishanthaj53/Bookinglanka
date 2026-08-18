@@ -17,9 +17,16 @@ export default function SignupSection() {
   const [resendLoading, setResendLoading] = useState(false);
   const [resendMessage, setResendMessage] = useState("");
 
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+
   const { register, handleSubmit } = useForm();
 
   const onSubmit = async (data) => {
+    if (!acceptedTerms) {
+      window.alert("Please accept the Terms & Conditions before creating an account.");
+      feedbackWarning(showFeedback, "Please accept the Terms & Conditions to continue.");
+      return;
+    }
     if (data.password !== data.confirmPassword) {
       feedbackWarning(showFeedback, "Password and confirm password must match.");
       return;
@@ -188,9 +195,17 @@ export default function SignupSection() {
 
                     <div className="login-page__input-box login-page__input-box--bottom">
                       <div className="login-page__input-box__inner">
-                        <input id="terms" type="checkbox" required />
+                        <input
+                          id="terms"
+                          type="checkbox"
+                          checked={acceptedTerms}
+                          onChange={(e) => setAcceptedTerms(e.target.checked)}
+                        />
                         <label htmlFor="terms">
-                          I agree to the Terms & Conditions 
+                          I agree to the{" "}
+                          <Link to="/terms" target="_blank" rel="noreferrer">
+                            Terms &amp; Conditions
+                          </Link>
                         </label>
                       </div>
                     </div>
